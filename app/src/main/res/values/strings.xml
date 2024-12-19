@@ -4,11 +4,18 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
 
-    <!-- fragment_login.xml -->
+    <!-- fragment_login.xml / fragment_login.xml -->
+    <string name="title_login">Login</string>
     <string name="label_username">Username:</string>
     <string name="label_password">Password:</string>
     <string name="hint_username">Type username here…</string>
     <string name="login">Login</string>
     <string name="text_to_signup">Don\'t have account yet?</string>
     <string name="signup">Signup</string>
+
+    <string name="title_registration">Registration</string>
+    <string name="label_email">Email:</string>
+    <string name="hint_email">Type email here…</string>
+    <string name="label_repeat_password">Repeat password:</string>
+    <string name="text_to_login">Already have and account?</string>
 </resources>
