@@ -18,4 +18,11 @@
     <string name="hint_email">Type email here…</string>
     <string name="label_repeat_password">Repeat password:</string>
     <string name="text_to_login">Already have and account?</string>
+
+    <string name="error_email_empty">Email can\'t be empty</string>
+    <string name="error_username_empty">Username can\'t be empty</string>
+    <string name="error_password_empty">Password can\'t be empty</string>
+    <string name="error_passwords_not_matching">Passwords must be matching!</string>
+    <string name="error_unable_to_connect_to_server">Unable to connect to server :(</string>
+    <string name="error_failed_login">Wrong username or password!</string>
 </resources>

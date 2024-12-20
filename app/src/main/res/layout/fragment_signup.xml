@@ -24,7 +24,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/label_username"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/inputEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/errorEmail" />
 
     <EditText
         android:id="@+id/inputUsername"
@@ -33,7 +33,7 @@
         android:layout_marginTop="16dp"
         android:ems="10"
         android:inputType="text"
-        android:text="@string/hint_username"
+        android:hint="@string/hint_username"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
@@ -46,7 +46,7 @@
         android:layout_marginTop="16dp"
         android:text="@string/label_password"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/inputUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/errorUsername" />
 
     <EditText
         android:id="@+id/inputPassword"
@@ -69,7 +69,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/inputRepeatPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/errorRepeatPassword" />
 
     <TextView
         android:id="@+id/labelLogin"
@@ -78,9 +78,9 @@
         android:layout_marginTop="24dp"
         android:text="@string/text_to_login"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/btnSignup" />
+        app:layout_constraintTop_toBottomOf="@+id/errorSignup" />
 
     <TextView
         android:id="@+id/btnGoToLogin"
@@ -101,7 +101,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="80dp" />
+        app:layout_constraintGuide_begin="34dp" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
@@ -132,7 +132,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:text="@string/hint_username"
+        android:hint="@string/hint_username"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintHorizontal_bias="0.0"
@@ -146,7 +146,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/label_repeat_password"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/errorPassword" />
 
     <EditText
         android:id="@+id/inputRepeatPassword"
@@ -171,5 +171,58 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+    <TextView
+        android:id="@+id/errorEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#FB0000"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/inputEmail" />
+
+    <TextView
+        android:id="@+id/errorUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/inputUsername" />
+
+    <TextView
+        android:id="@+id/errorPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/inputPassword"
+        tools:layout_editor_absoluteX="59dp" />
+
+    <TextView
+        android:id="@+id/errorRepeatPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="#FB0000"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/inputRepeatPassword" />
+
+    <TextView
+        android:id="@+id/errorSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text=""
+        android:textColor="#FF0000"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/btnSignup" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
