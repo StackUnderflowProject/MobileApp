@@ -3,4 +3,26 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <!-- fragment_login.xml / fragment_login.xml -->
+    <string name="title_login">Login</string>
+    <string name="label_username">Username:</string>
+    <string name="label_password">Password:</string>
+    <string name="hint_username">Type username here…</string>
+    <string name="login">Login</string>
+    <string name="text_to_signup">Don\'t have account yet?</string>
+    <string name="signup">Signup</string>
+
+    <string name="title_registration">Registration</string>
+    <string name="label_email">Email:</string>
+    <string name="hint_email">Type email here…</string>
+    <string name="label_repeat_password">Repeat password:</string>
+    <string name="text_to_login">Already have and account?</string>
+
+    <string name="error_email_empty">Email can\'t be empty</string>
+    <string name="error_username_empty">Username can\'t be empty</string>
+    <string name="error_password_empty">Password can\'t be empty</string>
+    <string name="error_passwords_not_matching">Passwords must be matching!</string>
+    <string name="error_unable_to_connect_to_server">Unable to connect to server :(</string>
+    <string name="error_failed_login">Wrong username or password!</string>
 </resources>
