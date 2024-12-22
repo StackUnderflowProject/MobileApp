@@ -16,6 +16,7 @@ navigationFragmentKtx = "2.8.4"
 navigationUiKtx = "2.8.4"
 osmdroidAndroid = "6.1.11"
 retrofit = "2.9.0"
+squareupPicasso = "2.71828"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 material-v120alpha02 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+squareup-picasso = { module = "com.squareup.picasso:picasso", version.ref = "squareupPicasso" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

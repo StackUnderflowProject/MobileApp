@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.spotter.databinding.FragmentEventBinding
-import com.bumptech.glide.Glide
+import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,7 +47,7 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         if (event.hostObj != null && event.hostObj!!.iconPath.isEmpty()) {
             holder.binding.userIcon.setImageDrawable(Drawable.createFromPath("@drawable/download__5__removebg_preview"))
         } else {
-            Glide.with(holder.itemView.context)
+            Picasso.get()
                 .load(event.hostObj?.iconPath)
                 .into(holder.binding.userIcon)
         }
