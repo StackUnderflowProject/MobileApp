@@ -6,20 +6,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.example.spotter.R
 import com.example.spotter.databinding.FragmentHomeBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
+
 class HomeFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var map : MapView
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +44,13 @@ class HomeFragment : Fragment() {
         mapController.setZoom(15.0)
         mapController.setCenter(startPoint)
 
+        val bottomSheet = binding.bottomSheet
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.isHideable = true
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        bottomSheetBehavior.peekHeight = 100
+        bottomSheetBehavior.isDraggable = false
+
         return binding.root
     }
 
@@ -51,6 +61,11 @@ class HomeFragment : Fragment() {
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
         marker.icon = resources.getDrawable(R.drawable.marker_activity, null)
         marker.title = "Eiffel Tower"
+        marker.setOnMarkerClickListener { a, b -> run {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            else bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            return@setOnMarkerClickListener true
+        }}
         map.overlays.add(marker)
     }
 

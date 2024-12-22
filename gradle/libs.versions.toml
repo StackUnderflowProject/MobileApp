@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.0"
+githubGlide = "4.15.1"
 kotlin = "1.9.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -10,12 +11,17 @@ material = "1.12.0"
 constraintlayout = "2.2.0"
 lifecycleLivedataKtx = "2.8.7"
 lifecycleViewmodelKtx = "2.8.7"
+materialVersion = "1.2.0-alpha02"
 navigationFragmentKtx = "2.8.4"
 navigationUiKtx = "2.8.4"
 osmdroidAndroid = "6.1.11"
+retrofit = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+com-github-bumptech-glide-glide = { module = "com.github.bumptech.glide:glide", version.ref = "githubGlide" }
+compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "githubGlide" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -26,7 +32,9 @@ androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecy
 androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+material-v120alpha02 = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

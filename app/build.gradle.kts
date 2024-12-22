@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.spotter"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -39,6 +39,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.com.github.bumptech.glide.glide)
+    implementation(libs.compiler)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
