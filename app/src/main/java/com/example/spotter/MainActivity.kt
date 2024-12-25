@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        launchFragment(LoginFragment())
+        //launchFragment(LoginFragment())
 
         val navView: BottomNavigationView = binding.navView
         supportActionBar?.hide() // hides top left page title
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         if (fragment is LoginFragment) {
             fragmentTransaction.replace(binding.loginContainer.id, fragment)
             binding.navView.visibility = View.GONE
-            //binding.loginContainer.visibility = View.VISIBLE
+            binding.loginContainer.visibility = View.VISIBLE
         } else {
             fragmentTransaction.addToBackStack(null)
         }
