@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         //launchFragment(LoginFragment())
+        launchFragment(AddEventFragment())
 
         val navView: BottomNavigationView = binding.navView
         supportActionBar?.hide() // hides top left page title
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    private fun launchFragment(fragment : Fragment) {
+    fun launchFragment(fragment : Fragment, backStack : Boolean = true, bundle: Bundle? = null) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         if (fragment is LoginFragment) {
@@ -48,7 +49,9 @@ class MainActivity : AppCompatActivity() {
             binding.navView.visibility = View.GONE
             binding.loginContainer.visibility = View.VISIBLE
         } else {
-            fragmentTransaction.addToBackStack(null)
+            bundle?.let {fragment.arguments = bundle}
+            fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
+            if (backStack) fragmentTransaction.addToBackStack(null)
         }
 
         fragmentTransaction.commit()

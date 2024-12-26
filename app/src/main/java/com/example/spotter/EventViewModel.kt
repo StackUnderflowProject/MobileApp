@@ -38,11 +38,31 @@ class EventViewModel : ViewModel() {
         })
     }
 
-    fun addItem(e: Event) {
-        val currentList = events.value.orEmpty().toMutableList()
-        currentList.add(e)
-        action = 1
-        events.value = currentList
+    fun addItem(e: Event, callback: (Boolean) -> Unit) {
+        RetrofitInstance.api.createEvent(e).enqueue(object : Callback<ServerResponse> {
+            override fun onResponse(
+                call: Call<ServerResponse>,
+                response: Response<ServerResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val message = response.body()?.message
+                    Log.i("Output", message ?: "no message")
+                    val currentList = events.value.orEmpty().toMutableList()
+                    currentList.add(0, e)
+                    action = 1
+                    events.value = currentList
+                    callback(true)
+                } else {
+                    Log.i("Output", "Error: ${response.code()}")
+                    callback(false)
+                }
+            }
+
+            override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
+                Log.i("Output", "Failed ${t.message}")
+                callback(false)
+            }
+        })
     }
 
     fun removeItem(e: Event) {
