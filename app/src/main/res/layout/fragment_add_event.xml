@@ -69,7 +69,7 @@
                         android:text="@string/description_label"
                         android:textSize="16sp"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
-                        app:layout_constraintTop_toBottomOf="@+id/inputName" />
+                        app:layout_constraintTop_toBottomOf="@+id/errorName" />
 
                     <TextView
                         android:id="@+id/textView5"
@@ -79,7 +79,7 @@
                         android:text="@string/date_label"
                         android:textSize="16sp"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
-                        app:layout_constraintTop_toBottomOf="@+id/inputActivity" />
+                        app:layout_constraintTop_toBottomOf="@+id/errorActivity" />
 
                     <TextView
                         android:id="@+id/textView6"
@@ -89,7 +89,7 @@
                         android:text="@string/time_label"
                         android:textSize="16sp"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
-                        app:layout_constraintTop_toBottomOf="@+id/inputDate" />
+                        app:layout_constraintTop_toBottomOf="@+id/errorDate" />
 
                     <EditText
                         android:id="@+id/inputName"
@@ -138,12 +138,12 @@
                         android:id="@+id/btnCreateEvent"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:text="@string/create_event"
+                        android:layout_marginTop="16dp"
 
+                        android:text="@string/create_event"
                         app:layout_constraintEnd_toStartOf="@+id/guideline6"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
-                        app:layout_constraintTop_toBottomOf="@+id/inputTime" />
+                        app:layout_constraintTop_toBottomOf="@+id/errorTime" />
 
                     <androidx.constraintlayout.widget.Guideline
                         android:id="@+id/guideline5"
@@ -179,7 +179,7 @@
                         android:text="@string/activity_label"
                         android:textSize="16sp"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
-                        app:layout_constraintTop_toBottomOf="@+id/inputDescription" />
+                        app:layout_constraintTop_toBottomOf="@+id/errorDescription" />
 
                     <EditText
                         android:id="@+id/inputActivity"
@@ -190,6 +190,57 @@
                         app:layout_constraintEnd_toStartOf="@+id/guideline6"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"
                         app:layout_constraintTop_toBottomOf="@+id/labelActivity" />
+
+                    <TextView
+                        android:id="@+id/errorName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textColor="#FF0000"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/guideline5"
+                        app:layout_constraintTop_toBottomOf="@+id/inputName" />
+
+                    <TextView
+                        android:id="@+id/errorDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textColor="#FF0000"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/guideline5"
+                        app:layout_constraintTop_toBottomOf="@+id/inputDescription" />
+
+                    <TextView
+                        android:id="@+id/errorActivity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textColor="#FF0000"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/guideline5"
+                        app:layout_constraintTop_toBottomOf="@+id/inputActivity" />
+
+                    <TextView
+                        android:id="@+id/errorDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="TextView"
+                        android:textColor="#FF0000"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/guideline5"
+                        app:layout_constraintTop_toBottomOf="@+id/inputDate" />
+
+                    <TextView
+                        android:id="@+id/errorTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textColor="#FF0000"
+                        android:visibility="gone"
+                        app:layout_constraintStart_toStartOf="@+id/guideline5"
+                        app:layout_constraintTop_toBottomOf="@+id/inputTime" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </ScrollView>
         </androidx.constraintlayout.widget.ConstraintLayout>

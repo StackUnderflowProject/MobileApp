@@ -92,34 +92,65 @@ class AddEventFragment : Fragment() {
         }
 
         binding.btnCreateEvent.setOnClickListener {
-            if (binding.inputName.text.isEmpty() || binding.inputDescription.text.isEmpty() || binding.inputActivity.text.isEmpty() || binding.inputDate.text.isEmpty() || binding.inputTime.text.isEmpty() || locationSelected == null) return@setOnClickListener
-            val event = Event(
-                binding.inputName.text.toString(),
-                binding.inputDescription.text.toString(),
-                binding.inputActivity.text.toString(),
-                convertDateTimeToMillis(binding.inputDate.text.toString(), binding.inputTime.text.toString()),
-                Pair<Double, Double>(locationSelected!!.latitude, locationSelected!!.longitude)
-            )
-            eventsViewModel.addItem(event) { success ->
-                if (success) {
-                    // go to list and scroll to post
-                    val bundle = Bundle()
-                    bundle.putInt("eventPosition", 0)
-                    requireActivity().supportFragmentManager.popBackStack()
-                    requireActivity().supportFragmentManager.popBackStack()
-                    (activity as? MainActivity)?.launchFragment(DashboardFragment(), false, bundle)
-                } else {
-                    binding.errorLabel.visibility = View.VISIBLE
-                }
-            }
+            var formOK = true
 
-            binding.inputName.setText(String())
-            binding.inputDescription.setText(String())
-            binding.inputActivity.setText(String())
-            binding.inputDate.setText(String())
-            binding.inputTime.setText(String())
-            binding.errorLabel.visibility = View.GONE
-            locationSelected = null
+            var nameErrorMsg : String = ""
+            if (binding.inputName.text.isEmpty()) {nameErrorMsg = getString(R.string.error_empty_field); formOK = false;}
+
+            var descriptionErrorMsg : String = ""
+            if (binding.inputDescription.text.isEmpty()) {descriptionErrorMsg = getString(R.string.error_empty_field); formOK = false;}
+
+            var activityErrorMsg : String = ""
+            if (binding.inputActivity.text.isEmpty()) {activityErrorMsg = getString(R.string.error_empty_field); formOK = false;}
+
+            var dateErrorMsg : String = ""
+            if (binding.inputDate.text.isEmpty()) {dateErrorMsg = getString(R.string.error_empty_field); formOK = false;}
+
+            var timeErrorMsg : String = ""
+            if (binding.inputTime.text.isEmpty()) {timeErrorMsg = getString(R.string.error_empty_field); formOK = false;}
+
+            if (formOK) {
+                val event = Event(
+                    binding.inputName.text.toString(),
+                    binding.inputDescription.text.toString(),
+                    binding.inputActivity.text.toString(),
+                    convertDateTimeToMillis(
+                        binding.inputDate.text.toString(),
+                        binding.inputTime.text.toString()
+                    ),
+                    Pair<Double, Double>(locationSelected!!.latitude, locationSelected!!.longitude)
+                )
+                eventsViewModel.addItem(event) { success ->
+                    if (success) {
+                        // go to list and scroll to post
+                        val bundle = Bundle()
+                        bundle.putInt("eventPosition", 0)
+                        requireActivity().supportFragmentManager.popBackStack()
+                        requireActivity().supportFragmentManager.popBackStack()
+                        (activity as? MainActivity)?.launchFragment(
+                            DashboardFragment(),
+                            false,
+                            bundle
+                        )
+                    } else {
+                        binding.errorLabel.visibility = View.VISIBLE
+                    }
+                }
+
+                binding.inputName.setText(String())
+                binding.inputDescription.setText(String())
+                binding.inputActivity.setText(String())
+                binding.inputDate.setText(String())
+                binding.inputTime.setText(String())
+                binding.errorLabel.visibility = View.GONE
+                locationSelected = null
+            } else {
+                if (timeErrorMsg.isNotEmpty()) {binding.errorTime.text = timeErrorMsg; binding.errorTime.visibility = View.VISIBLE; binding.errorTime.requestFocus();}
+                if (dateErrorMsg.isNotEmpty()) {binding.errorDate.text = dateErrorMsg; binding.errorDate.visibility = View.VISIBLE; binding.errorDate.requestFocus();}
+                if (activityErrorMsg.isNotEmpty()) {binding.errorActivity.text = activityErrorMsg; binding.errorActivity.visibility = View.VISIBLE; binding.errorActivity.requestFocus();}
+                if (descriptionErrorMsg.isNotEmpty()) {binding.errorDescription.text = descriptionErrorMsg; binding.errorDescription.visibility = View.VISIBLE; binding.errorDescription.requestFocus();}
+                if (nameErrorMsg.isNotEmpty()) {binding.errorName.text = nameErrorMsg; binding.errorName.visibility = View.VISIBLE; binding.errorName.requestFocus();}
+            }
         }
 
         return binding.root
