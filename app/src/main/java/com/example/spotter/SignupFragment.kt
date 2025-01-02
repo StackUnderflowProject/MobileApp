@@ -1,4 +1,4 @@
-package com.example.spotter.ui
+package com.example.spotter
 
 import android.os.Bundle
 import android.util.Log
@@ -6,10 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.spotter.LoginFragment
-import com.example.spotter.R
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentSignupBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupFragment : Fragment() {
     private lateinit var binding: FragmentSignupBinding
@@ -50,15 +51,14 @@ class SignupFragment : Fragment() {
             if (inputRepeatPassword.text.isEmpty()) {repeatPasswordErrorMsg = getString(R.string.error_password_empty); formOK = false;}
 
             if (formOK) {
-                // do signup logic here
-                val signupOK = true
-                if (signupOK) {
-                    // go to login
-                    launchLogin()
-                } else {
-                    errorSignup.text = getString(R.string.error_unable_to_connect_to_server)
-                    errorSignup.text = getString(R.string.error_failed_login)
-                    errorSignup.visibility = View.VISIBLE
+                register(inputUsername.text.toString(), inputEmail.text.toString(), inputPassword.text.toString()) { code ->
+                    if (code == 0) {
+                        launchLogin(inputUsername.text.toString())
+                    } else {
+                        if (code == 1) errorSignup.text = getString(R.string.error_failed_login)
+                        if (code == 2) errorSignup.text = getString(R.string.error_unable_to_connect_to_server)
+                        errorSignup.visibility = View.VISIBLE
+                    }
                 }
             } else {
                 if (repeatPasswordErrorMsg.isNotEmpty()) {errorRepeatPassword.text = repeatPasswordErrorMsg; errorRepeatPassword.visibility = View.VISIBLE; inputRepeatPassword.requestFocus();}
@@ -75,12 +75,39 @@ class SignupFragment : Fragment() {
         return binding.root
     }
 
-    private fun launchLogin() {
+    private fun launchLogin(username: String? = null) {
         val fragment = LoginFragment()
+        if (username != null) {
+            val bundle = Bundle()
+            bundle.putString("username", username)
+            fragment.arguments = bundle
+        }
         val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
 
         fragmentTransaction.replace(mainBinding.loginContainer.id, fragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+    }
+
+    private fun register(username: String, email: String, password: String, callback: (Int) -> Unit) {
+        RetrofitInstance.api.register(REGISTER_MODEL(username, email, password))
+            .enqueue(object : Callback<User> {
+                override fun onResponse(
+                    call: Call<User>,
+                    response: Response<User>
+                ) {
+                    if (response.isSuccessful) {
+                        callback(0)
+                    } else {
+                        Log.i("Output", "register(), Error: ${response.code()}")
+                        callback(1)
+                    }
+                }
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("Output", "Failed ${t.message}")
+                    callback(2)
+                }
+            }
+            )
     }
 }

@@ -28,4 +28,7 @@ interface ApiService {
     @POST("/users/login")
     fun login(@Body user: LOGIN_MODEL) : Call<User>
 
+    @POST("/users/register")
+    fun register(@Body user : REGISTER_MODEL) : Call<User>
+
 }
