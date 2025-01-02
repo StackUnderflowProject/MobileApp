@@ -1,5 +1,6 @@
 package com.example.spotter
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -10,12 +11,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.ui.SignupFragment
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var myApp: SpotterApp
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +28,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //launchFragment(LoginFragment())
+        myApp = application as SpotterApp
+
+        myApp.user = myApp.getUser(this)
+        if (myApp.user == null || myApp.user!!.jwt.isEmpty()) {
+            launchFragment(LoginFragment())
+        }
+        //launchFragment(AddEventFragment())
 
         val navView: BottomNavigationView = binding.navView
         supportActionBar?.hide() // hides top left page title
@@ -40,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    private fun launchFragment(fragment : Fragment) {
+    fun launchFragment(fragment : Fragment, backStack : Boolean = true, bundle: Bundle? = null) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         if (fragment is LoginFragment) {
@@ -48,7 +59,9 @@ class MainActivity : AppCompatActivity() {
             binding.navView.visibility = View.GONE
             binding.loginContainer.visibility = View.VISIBLE
         } else {
-            fragmentTransaction.addToBackStack(null)
+            bundle?.let {fragment.arguments = bundle}
+            fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
+            if (backStack) fragmentTransaction.addToBackStack(null)
         }
 
         fragmentTransaction.commit()

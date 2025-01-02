@@ -25,4 +25,27 @@
     <string name="error_passwords_not_matching">Passwords must be matching!</string>
     <string name="error_unable_to_connect_to_server">Unable to connect to server :(</string>
     <string name="error_failed_login">Wrong username or password!</string>
+
+    <!-- fragment_add_event.xml / fragment_edit_event.xml -->
+    <string name="title_add_event">Create Event</string>
+
+    <string name="name_label">Name:</string>
+    <string name="description_label">Description:</string>
+    <string name="date_label">Date:</string>
+    <string name="time_label">Time:</string>
+    <string name="location_label">Location:</string>
+    <string name="activity_label">Activity:</string>
+
+    <string name="name_hint">Event Name</string>
+    <string name="description_hint">Event Description</string>
+    <string name="date_hint">Event Date</string>
+    <string name="time_hint">Event Time</string>
+    <string name="location_hint">Event Location</string>
+    <string name="activity_hint">Event Activity</string>
+
+    <string name="create_event">Create Event</string>
+    <string name="update_event">Update Event</string>
+
+    <string name="error_failed_create_event">Failed to create the event!</string>
+    <string name="error_empty_field">This field can not be empty</string>
 </resources>
