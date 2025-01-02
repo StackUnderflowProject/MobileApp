@@ -5,11 +5,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentLoginBinding
-import com.example.spotter.ui.SignupFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -36,6 +34,11 @@ class LoginFragment : Fragment() {
         val errorPassword = binding.errorPassword
         val errorLogin = binding.errorLogin
 
+        savedInstanceState?.let {
+            val username = savedInstanceState.getString("username", "")
+            inputUsername.setText(username)
+        }
+
         binding.btnLogin.setOnClickListener {
             var formOK = true
 
@@ -46,8 +49,8 @@ class LoginFragment : Fragment() {
             if (inputPassword.text.isEmpty()) {passwordErrorMsg = getString(R.string.error_password_empty); formOK = false;}
 
             if (formOK) {
-                login(inputUsername.text.toString(), inputPassword.text.toString()) { success ->
-                    if (success) {
+                login(inputUsername.text.toString(), inputPassword.text.toString()) { code ->
+                    if (code == 0) {
                         // go to home
                         mainBinding?.let {
                             mainBinding!!.loginContainer.visibility = View.GONE
@@ -57,8 +60,8 @@ class LoginFragment : Fragment() {
                         fragmentTransaction.remove(requireActivity().supportFragmentManager.findFragmentById(R.id.loginContainer)!!)
                         fragmentTransaction.commit()
                     } else {
-                        errorLogin.text = getString(R.string.error_unable_to_connect_to_server)
-                        errorLogin.text = getString(R.string.error_failed_login)
+                        if (code == 1) errorLogin.text = getString(R.string.error_failed_login)
+                        if (code == 2) errorLogin.text = getString(R.string.error_unable_to_connect_to_server)
                         errorLogin.visibility = View.VISIBLE
                     }
                 }
@@ -82,7 +85,7 @@ class LoginFragment : Fragment() {
         return binding.root
     }
 
-    private fun login(username : String, password : String, callback: (Boolean) -> Unit) {
+    private fun login(username : String, password : String, callback: (Int) -> Unit) {
         RetrofitInstance.api.login(LOGIN_MODEL(username, password))
             .enqueue(object : Callback<User> {
                 override fun onResponse(
@@ -93,15 +96,15 @@ class LoginFragment : Fragment() {
                         val user = response.body()
                         myApp.user = user
                         myApp.storeUser(requireContext(), user!!)
-                        callback(true)
+                        callback(0)
                     } else {
                         Log.i("Output", "login(), Error: ${response.code()}")
-                        callback(false)
+                        callback(1)
                     }
                 }
                 override fun onFailure(call: Call<User>, t: Throwable) {
                     Log.i("Output", "Failed ${t.message}")
-                    callback(false)
+                    callback(2)
                 }
             }
         )

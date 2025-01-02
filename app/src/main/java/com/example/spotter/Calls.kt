@@ -8,6 +8,12 @@ data class LOGIN_MODEL(
     val password : String
 ) {}
 
+data class REGISTER_MODEL(
+    val username : String,
+    val email : String,
+    val password : String
+) {}
+
 data class CREATE_EVENT_MODEL(
     val name : String,
     val description : String,
