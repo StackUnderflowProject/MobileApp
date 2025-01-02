@@ -1,5 +1,6 @@
 package com.example.spotter
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -10,12 +11,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.ui.SignupFragment
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var myApp: SpotterApp
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,8 +28,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //launchFragment(LoginFragment())
-        launchFragment(AddEventFragment())
+        myApp = application as SpotterApp
+
+        myApp.user = myApp.getUser(this)
+        if (myApp.user == null || myApp.user!!.jwt.isEmpty()) {
+            launchFragment(LoginFragment())
+        }
+        //launchFragment(AddEventFragment())
 
         val navView: BottomNavigationView = binding.navView
         supportActionBar?.hide() // hides top left page title

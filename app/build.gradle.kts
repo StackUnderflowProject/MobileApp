@@ -39,6 +39,9 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.org.mongodb.bson)
+    implementation(libs.squareup.logging.interceptor)
     implementation(libs.squareup.picasso)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

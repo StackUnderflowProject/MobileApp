@@ -31,6 +31,8 @@ import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class AddEventFragment : Fragment() {
     private lateinit var myApp : SpotterApp
@@ -114,10 +116,8 @@ class AddEventFragment : Fragment() {
                     binding.inputName.text.toString(),
                     binding.inputDescription.text.toString(),
                     binding.inputActivity.text.toString(),
-                    convertDateTimeToMillis(
-                        binding.inputDate.text.toString(),
-                        binding.inputTime.text.toString()
-                    ),
+                    convertToLocalDate(binding.inputDate.text.toString()),
+                    binding.inputTime.text.toString(),
                     Pair<Double, Double>(locationSelected!!.latitude, locationSelected!!.longitude)
                 )
                 eventsViewModel.addItem(event) { success ->
@@ -216,10 +216,13 @@ class AddEventFragment : Fragment() {
         mapView.invalidate()
     }
 
-    private fun convertDateTimeToMillis(dateString: String, timeString: String): Long {
-        val combinedDateTime = "$dateString $timeString"
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        val date = dateFormat.parse(combinedDateTime)
-        return date?.time ?: 0L
+    private fun convertToLocalDate(dateString: String): LocalDate {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        return try {
+            LocalDate.parse(dateString, formatter)
+        } catch (e: Exception) {
+            Log.i("Output", "Cant format the date field")
+            return LocalDate.of(1970, 1, 1)
+        }
     }
 }

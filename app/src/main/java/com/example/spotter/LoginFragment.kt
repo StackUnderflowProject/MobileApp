@@ -10,10 +10,14 @@ import androidx.fragment.app.Fragment
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentLoginBinding
 import com.example.spotter.ui.SignupFragment
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class LoginFragment : Fragment() {
     private lateinit var binding: FragmentLoginBinding
     private var mainBinding : ActivityMainBinding? = null
+    private lateinit var myApp: SpotterApp
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,6 +27,8 @@ class LoginFragment : Fragment() {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         val containerParent = container?.parent as? View
         mainBinding = containerParent?.let { ActivityMainBinding.bind(it) }
+
+        myApp = requireActivity().application as SpotterApp
 
         val inputUsername = binding.inputUsername
         val inputPassword = binding.inputPassword
@@ -40,21 +46,21 @@ class LoginFragment : Fragment() {
             if (inputPassword.text.isEmpty()) {passwordErrorMsg = getString(R.string.error_password_empty); formOK = false;}
 
             if (formOK) {
-                // do login logic here
-                val loginOK = true
-                if (loginOK) {
-                    // go to home
-                    mainBinding?.let {
-                        mainBinding!!.loginContainer.visibility = View.GONE
-                        mainBinding!!.navView.visibility = View.VISIBLE
+                login(inputUsername.text.toString(), inputPassword.text.toString()) { success ->
+                    if (success) {
+                        // go to home
+                        mainBinding?.let {
+                            mainBinding!!.loginContainer.visibility = View.GONE
+                            mainBinding!!.navView.visibility = View.VISIBLE
+                        }
+                        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                        fragmentTransaction.remove(requireActivity().supportFragmentManager.findFragmentById(R.id.loginContainer)!!)
+                        fragmentTransaction.commit()
+                    } else {
+                        errorLogin.text = getString(R.string.error_unable_to_connect_to_server)
+                        errorLogin.text = getString(R.string.error_failed_login)
+                        errorLogin.visibility = View.VISIBLE
                     }
-                    val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
-                    fragmentTransaction.remove(requireActivity().supportFragmentManager.findFragmentById(R.id.loginContainer)!!)
-                    fragmentTransaction.commit()
-                } else {
-                    errorLogin.text = getString(R.string.error_unable_to_connect_to_server)
-                    errorLogin.text = getString(R.string.error_failed_login)
-                    errorLogin.visibility = View.VISIBLE
                 }
             } else {
                 if (passwordErrorMsg.isNotEmpty()) {errorPassword.text = passwordErrorMsg; errorPassword.visibility = View.VISIBLE; inputPassword.requestFocus();}
@@ -74,5 +80,30 @@ class LoginFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    private fun login(username : String, password : String, callback: (Boolean) -> Unit) {
+        RetrofitInstance.api.login(LOGIN_MODEL(username, password))
+            .enqueue(object : Callback<User> {
+                override fun onResponse(
+                    call: Call<User>,
+                    response: Response<User>
+                ) {
+                    if (response.isSuccessful) {
+                        val user = response.body()
+                        myApp.user = user
+                        myApp.storeUser(requireContext(), user!!)
+                        callback(true)
+                    } else {
+                        Log.i("Output", "login(), Error: ${response.code()}")
+                        callback(false)
+                    }
+                }
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("Output", "Failed ${t.message}")
+                    callback(false)
+                }
+            }
+        )
     }
 }

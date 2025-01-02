@@ -2,7 +2,6 @@ package com.example.spotter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.provider.Settings.Global.getString
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -28,8 +27,8 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
 
         holder.binding.username.text = event.hostObj?.username ?: "Username not loaded"
         holder.binding.userEmail.text = event.hostObj?.email ?: "Email not loaded"
-        holder.binding.eventDate.text = event.getLocalDate()
-        holder.binding.eventTime.text = event.getLocalTime()
+        holder.binding.eventDate.text = event.date.toString()
+        holder.binding.eventTime.text = event.time
         holder.binding.title.text = event.title
         holder.binding.description.text = event.description
         holder.binding.location.text = event.location.toString()
@@ -44,16 +43,16 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         })
         holder.binding.subscribeCount.text = event.followers.size.toString()
 
-        if (event.hostObj != null && event.hostObj!!.iconPath.isEmpty()) {
+        if (event.hostObj != null && event.hostObj!!.image.isEmpty()) {
             holder.binding.userIcon.setImageDrawable(Drawable.createFromPath("@drawable/download__5__removebg_preview"))
         } else {
             Picasso.get()
-                .load(event.hostObj?.iconPath)
+                .load(event.hostObj?.image)
                 .into(holder.binding.userIcon)
         }
 
         holder.binding.btnSubscribe.setOnClickListener {
-            RetrofitInstance.api.subscribeToEvent(event.uuid).enqueue(object : Callback<ServerResponse> {
+            RetrofitInstance.api.subscribeToEvent(event.id).enqueue(object : Callback<ServerResponse> {
                 override fun onResponse(
                     call: Call<ServerResponse>,
                     response: Response<ServerResponse>

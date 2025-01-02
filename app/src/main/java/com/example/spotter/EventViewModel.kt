@@ -4,9 +4,13 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
 
 class EventViewModel : ViewModel() {
     private val events = MutableLiveData<MutableList<Event>>(mutableListOf())
@@ -17,29 +21,37 @@ class EventViewModel : ViewModel() {
     val currentEvents : LiveData<MutableList<Event>> get() = events
 
     fun getAllEvents() {
-        RetrofitInstance.api.getAllEvents().enqueue(object : Callback<ServerResponse> {
+        RetrofitInstance.api.getAllEvents().enqueue(object : Callback<List<GET_ALL_EVENTS_MODEL>> {
             override fun onResponse(
-                call: Call<ServerResponse>,
-                response: Response<ServerResponse>
+                call: Call<List<GET_ALL_EVENTS_MODEL>>,
+                response: Response<List<GET_ALL_EVENTS_MODEL>>
             ) {
                 if (response.isSuccessful) {
-                    val message = response.body()?.message
-                    Log.i("Output", message ?: "no message")
-                    //action.value = 0
-                    //events.value = message.events
+                    val receivedEvents = response.body() ?: emptyList()
+                    val evnts = mutableListOf<Event>()
+                    receivedEvents.forEach { event ->
+                        evnts.add(event.toEvent())
+                        Log.i("MyEvents", event.name)
+                    }
+                    action = 0
+                    events.value = evnts
                 } else {
-                    Log.i("Output", "Error: ${response.code()}")
+                    Log.i("Output", call.toString())
+                    Log.i("Output", "getAllEvents(), Error: ${response.code()}")
                 }
             }
 
-            override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
+            override fun onFailure(call: Call<List<GET_ALL_EVENTS_MODEL>>, t: Throwable) {
                 Log.i("Output", "Failed ${t.message}")
             }
         })
     }
 
+
     fun addItem(e: Event, callback: (Boolean) -> Unit) {
-        RetrofitInstance.api.createEvent(e).enqueue(object : Callback<ServerResponse> {
+        val body = CREATE_EVENT_MODEL(e.title, e.description, e.activity, e.date, e.time, e.location, e.host.toString())
+
+        RetrofitInstance.api.createEvent(body).enqueue(object : Callback<ServerResponse> {
             override fun onResponse(
                 call: Call<ServerResponse>,
                 response: Response<ServerResponse>
@@ -53,7 +65,7 @@ class EventViewModel : ViewModel() {
                     events.value = currentList
                     callback(true)
                 } else {
-                    Log.i("Output", "Error: ${response.code()}")
+                    Log.i("Output", "createEvent(), Error: ${response.code()}")
                     callback(false)
                 }
             }
@@ -67,7 +79,7 @@ class EventViewModel : ViewModel() {
 
     fun removeItem(e: Event) {
         val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it.uuid == e.uuid }
+        val i = currentList.indexOfFirst { it.id == e.id }
         if (i != -1) {
             index = i
             currentList.removeAt(i)
@@ -78,7 +90,7 @@ class EventViewModel : ViewModel() {
 
     fun updateItem(e: Event) {
         val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it.uuid == e.uuid }
+        val i = currentList.indexOfFirst { it.id == e.id }
         if (i != -1) {
             index = i
             currentList[i] = e
