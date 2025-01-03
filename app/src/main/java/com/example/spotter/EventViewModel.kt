@@ -1,9 +1,12 @@
 package com.example.spotter
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.material.snackbar.Snackbar
 import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,7 +23,7 @@ class EventViewModel : ViewModel() {
 
     val currentEvents : LiveData<MutableList<Event>> get() = events
 
-    fun getAllEvents() {
+    fun getAllEvents(context: Context) {
         RetrofitInstance.api.getAllEvents().enqueue(object : Callback<List<GET_ALL_EVENTS_MODEL>> {
             override fun onResponse(
                 call: Call<List<GET_ALL_EVENTS_MODEL>>,
@@ -43,6 +46,7 @@ class EventViewModel : ViewModel() {
 
             override fun onFailure(call: Call<List<GET_ALL_EVENTS_MODEL>>, t: Throwable) {
                 Log.i("Output", "Failed ${t.message}")
+                Toast.makeText(context, "Failed to connect to server :(", Toast.LENGTH_LONG).show()
             }
         })
     }

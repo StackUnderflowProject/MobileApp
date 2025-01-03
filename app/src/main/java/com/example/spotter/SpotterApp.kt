@@ -22,7 +22,7 @@ class SpotterApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        eventsViewModel.getAllEvents()
+        eventsViewModel.getAllEvents(this)
     }
 
     override fun onTerminate() {
