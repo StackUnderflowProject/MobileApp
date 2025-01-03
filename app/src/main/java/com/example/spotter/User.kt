@@ -18,6 +18,7 @@ class User(
             put("email", email)
             put("image", image)
             put("token", token)
+            put("loginTime", loginTime)
         }
         return userJson.toString()
     }
@@ -34,7 +35,8 @@ class User(
                 username = userJson.getString("username"),
                 email = userJson.getString("email"),
                 image = userJson.optString("image", ""),
-                token = userJson.optString("token", "")
+                token = userJson.optString("token", ""),
+                loginTime = userJson.optLong("loginTime", 0)
             )
         }
     }
