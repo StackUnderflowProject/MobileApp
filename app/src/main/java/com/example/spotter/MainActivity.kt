@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         myApp = application as SpotterApp
 
         myApp.user = myApp.getUser(this)
-        if (myApp.user == null || myApp.user!!.jwt.isEmpty()) {
+        if (myApp.user == null || myApp.user!!.token.isEmpty()) {
             launchFragment(LoginFragment())
         }
         //launchFragment(AddEventFragment())

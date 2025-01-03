@@ -12,39 +12,6 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.Date
 
-class User(
-    val _id : String,
-    val username : String,
-    val email : String,
-    val __v : Int = 0,
-    val image : String = "",
-    var jwt : String = ""
-) {
-    fun toJson() : String {
-        val userJson = JSONObject().apply {
-            put("_id", _id)
-            put("username", username)
-            put("email", email)
-            put("image", image)
-            put("jwt", jwt)
-        }
-        return userJson.toString()
-    }
-
-    companion object {
-        fun toObject(userString : String) : User {
-            val userJson = JSONObject(userString)
-            return User(
-                _id = userJson.getString("_id"),
-                username = userJson.getString("username"),
-                email = userJson.getString("email"),
-                image = userJson.optString("image", ""),
-                jwt = userJson.optString("jwt", "")
-            )
-        }
-    }
-}
-
 data class Event(
     var title : String,
     var description : String,
