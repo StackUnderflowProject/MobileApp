@@ -1,6 +1,7 @@
 package com.example.spotter
 
 import android.os.Bundle
+import android.util.TimeUtils
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         myApp = application as SpotterApp
 
         myApp.user = myApp.getUser(this)
-        if (myApp.user == null || myApp.user!!.token.isEmpty()) {
+        if (myApp.user == null || myApp.user!!.token.isEmpty() || !myApp.user!!.isLoginValid()) {
             launchFragment(LoginFragment())
         }
         //launchFragment(AddEventFragment())

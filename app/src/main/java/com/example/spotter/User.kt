@@ -8,7 +8,8 @@ class User(
     val email : String,
     val __v : Int = 0,
     val image : String = "",
-    var token : String = ""
+    var token : String = "",
+    var loginTime : Long = 0
 ) {
     fun toJson() : String {
         val userJson = JSONObject().apply {
@@ -19,6 +20,10 @@ class User(
             put("token", token)
         }
         return userJson.toString()
+    }
+
+    fun isLoginValid() : Boolean {
+        return System.currentTimeMillis() - loginTime < 3550000 // a little less than a hour
     }
 
     companion object {

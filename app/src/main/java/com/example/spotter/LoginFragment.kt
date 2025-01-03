@@ -94,6 +94,7 @@ class LoginFragment : Fragment() {
                 ) {
                     if (response.isSuccessful) {
                         val user = response.body()
+                        user!!.loginTime = System.currentTimeMillis()
                         myApp.user = user
                         myApp.storeUser(requireContext(), user!!)
                         callback(0)
