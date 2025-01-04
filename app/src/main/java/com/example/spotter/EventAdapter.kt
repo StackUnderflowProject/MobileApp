@@ -1,18 +1,15 @@
 package com.example.spotter
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.spotter.databinding.FragmentEventBinding
 import com.squareup.picasso.Picasso
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class EventsAdapter(val context: Context, private val events: List<Event>, private val listener: EventClickListener) : RecyclerView.Adapter<EventsAdapter.EventViewHolder>() {
+class EventsAdapter(val context: Context, private val events: List<Event>, private val listener: EventClickListener, private var user: User?) : RecyclerView.Adapter<EventsAdapter.EventViewHolder>() {
 
     class EventViewHolder(val binding: FragmentEventBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -24,52 +21,35 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
 
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event: Event = events[position]
-
+        Log.i("Output2", event.toString())
         holder.binding.username.text = event.hostObj?.username ?: "Username not loaded"
         holder.binding.userEmail.text = event.hostObj?.email ?: "Email not loaded"
         holder.binding.eventDate.text = event.date.toString()
         holder.binding.eventTime.text = event.time
-        holder.binding.title.text = event.title
+        holder.binding.title.text = event.name
         holder.binding.description.text = event.description
         holder.binding.location.text = event.location.toString()
         holder.binding.activity.text = event.activity
         holder.binding.activityIcon.setImageDrawable(
-            when (event.activity) {
-                "nogomet" -> Drawable.createFromPath("@drawable/download_removebg_preview__1_")
-                "football" -> Drawable.createFromPath("@drawable/download_removebg_preview__1_")
-                "rokomet" -> Drawable.createFromPath("@drawable/group_91")
-                "handball" -> Drawable.createFromPath("@drawable/group_91")
-                else -> Drawable.createFromPath("@drawable/group_92")
+            when (event.activity.lowercase()) {
+                "nogomet", "futsal", "football" -> ContextCompat.getDrawable(context, R.drawable.download_removebg_preview__1_)
+                "rokomet", "handball" -> ContextCompat.getDrawable(context, R.drawable.group_91)
+                else -> ContextCompat.getDrawable(context, R.drawable.group_92)
         })
         holder.binding.subscribeCount.text = event.followers.size.toString()
 
-        if (event.hostObj != null && event.hostObj!!.image.isEmpty()) {
-            holder.binding.userIcon.setImageDrawable(Drawable.createFromPath("@drawable/download__5__removebg_preview"))
+        if (event.hostObj == null || event.hostObj?.image.isNullOrEmpty()) {
+            holder.binding.userIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.download__5__removebg_preview))
         } else {
             Picasso.get()
-                .load(event.hostObj?.image)
+                .load("http://77.38.76.152:3000/public/images/profile_pictures/" + (event.hostObj?.image ?: ""))
+                .error(ContextCompat.getDrawable(context, R.drawable.download__5__removebg_preview)!!)
                 .into(holder.binding.userIcon)
         }
 
+        holder.binding.btnSubscribe.text = if (event.followers.any { it == user?._id }) "Subscribed" else "Subscribe"
         holder.binding.btnSubscribe.setOnClickListener {
-            RetrofitInstance.api.subscribeToEvent(event.id).enqueue(object : Callback<ServerResponse> {
-                override fun onResponse(
-                    call: Call<ServerResponse>,
-                    response: Response<ServerResponse>
-                ) {
-                    if (response.isSuccessful) {
-                        val message = response.body()?.message
-                        Log.i("Output", message ?: "no message")
-                        // notify item changed myb
-                    } else {
-                        Log.i("Output", "Error: ${response.code()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
-                    Log.i("Output", "Failed ${t.message}")
-                }
-            })
+            listener.onSubscribeClick(event)
         }
 
         holder.binding.btnOptions.setOnClickListener {

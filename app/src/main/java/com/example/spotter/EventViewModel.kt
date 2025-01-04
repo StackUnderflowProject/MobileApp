@@ -6,14 +6,9 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.android.material.snackbar.Snackbar
-import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.util.Date
 
 class EventViewModel : ViewModel() {
     private val events = MutableLiveData<MutableList<Event>>(mutableListOf())
@@ -53,7 +48,7 @@ class EventViewModel : ViewModel() {
 
 
     fun addItem(e: Event, callback: (Boolean) -> Unit) {
-        val body = CREATE_EVENT_MODEL(e.title, e.description, e.activity, e.date, e.time, e.location, e.host.toString())
+        val body = CREATE_EVENT_MODEL(e.name, e.description, e.activity, e.date, e.time, e.location, e.host)
 
         RetrofitInstance.api.createEvent(body).enqueue(object : Callback<ServerResponse> {
             override fun onResponse(
@@ -83,7 +78,7 @@ class EventViewModel : ViewModel() {
 
     fun removeItem(e: Event) {
         val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it.id == e.id }
+        val i = currentList.indexOfFirst { it._id == e._id }
         if (i != -1) {
             index = i
             currentList.removeAt(i)
@@ -94,13 +89,42 @@ class EventViewModel : ViewModel() {
 
     fun updateItem(e: Event) {
         val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it.id == e.id }
+        val i = currentList.indexOfFirst { it._id == e._id }
         if (i != -1) {
             index = i
             currentList[i] = e
         }
         action = 3
         events.value = currentList
+    }
+
+    fun followEvent(e: Event, user: User?) {
+        RetrofitInstance.api.subscribeToEvent("Bearer: " + user?.token, e._id).enqueue(object : Callback<Event> {
+            override fun onResponse(
+                call: Call<Event>,
+                response: Response<Event>
+            ) {
+                if (response.isSuccessful) {
+                    Log.i("Output", "+ " + response.body()?.toString())
+                    val receivedEvent = response.body() ?: return
+                    action = 3
+                    val currentList = events.value.orEmpty().toMutableList()
+                    val i = currentList.indexOfFirst { it._id == e._id }
+                    if (i != -1) {
+                        index = i
+                        val updatedList = currentList.toMutableList().apply {this[i] = receivedEvent}
+                        events.value = updatedList
+                        Log.i("Output", "Updated")
+                    }
+                } else {
+                    Log.i("Output", "Error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Event>, t: Throwable) {
+                Log.i("Output", "Failed ${t.message}")
+            }
+        })
     }
 }
 

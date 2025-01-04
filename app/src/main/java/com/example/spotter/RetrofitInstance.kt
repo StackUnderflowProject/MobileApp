@@ -1,9 +1,20 @@
 package com.example.spotter
 
+import android.util.Log
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.bson.types.ObjectId
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.lang.reflect.Type
+import java.time.Instant
+import java.time.ZoneId
 
 object RetrofitInstance {
     private const val BASE_URL = "http://77.38.76.152:3000" // Replace with your server URL
@@ -16,12 +27,38 @@ object RetrofitInstance {
         .addInterceptor(loggingInterceptor)
         .build()
 
+    class LocalDateDeserializer : JsonDeserializer<LocalDate> {
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): LocalDate {
+            val dateTimeString = json.asString
+            val instant = Instant.parse(dateTimeString)
+            return instant.atZone(ZoneId.of("UTC")).toLocalDate()
+        }
+    }
+
+    class ObjectIdDeserializer : JsonDeserializer<ObjectId> {
+        override fun deserialize(
+            json: JsonElement,
+            typeOfT: Type,
+            context: JsonDeserializationContext
+        ): ObjectId {
+            return ObjectId(json.asString)
+        }
+    }
+
+    val gson = GsonBuilder()
+        .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
+        .registerTypeAdapter(ObjectId::class.java, ObjectIdDeserializer())
+        .create()
 
     val api: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(httpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService::class.java)
     }

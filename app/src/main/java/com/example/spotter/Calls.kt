@@ -20,20 +20,20 @@ data class CREATE_EVENT_MODEL(
     val activity : String,
     val date : LocalDate,
     val time : String,
-    val location : Pair<Double, Double>,
-    val host : String
+    val location : LOCATION,
+    val host : ObjectId
 ) {}
 
 class GET_ALL_EVENTS_MODEL(
     val location: LOCATION,
-    val _id: String,
+    val _id: ObjectId,
     val name: String,
     val description: String,
     val activity: String,
     val date: String,
     val time: String,
     val host: User,
-    val followers: MutableList<String>,
+    val followers: MutableList<ObjectId>,
     val score: String? = "",
     val hostObj: User?,
     val predicted_count: Int? = 0,
@@ -41,18 +41,16 @@ class GET_ALL_EVENTS_MODEL(
     val image: String? = ""
 ) {
     fun toEvent() : Event {
-        val followersObjects = mutableListOf<ObjectId>()
-        followers.forEach { f -> followersObjects.add(ObjectId(f)) }
         return Event(
             name,
             description,
             activity,
             convertToLocalDate(date),
             time,
-            Pair<Double, Double>(location.coordinates[1], location.coordinates[0]),
-            ObjectId(_id),
-            ObjectId(host._id),
-            followersObjects,
+            LOCATION("point", listOf(location.coordinates[1], location.coordinates[0])),
+            _id,
+            host._id,
+            followers,
             hostObj = host
         )
     }

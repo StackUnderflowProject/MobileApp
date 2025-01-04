@@ -118,7 +118,7 @@ class AddEventFragment : Fragment() {
                     binding.inputActivity.text.toString(),
                     convertToLocalDate(binding.inputDate.text.toString()),
                     binding.inputTime.text.toString(),
-                    Pair<Double, Double>(locationSelected!!.latitude, locationSelected!!.longitude)
+                    LOCATION("point", listOf(locationSelected!!.latitude, locationSelected!!.longitude))
                 )
                 eventsViewModel.addItem(event) { success ->
                     if (success) {

@@ -4,6 +4,7 @@ import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -20,7 +21,7 @@ interface ApiService {
     fun getUser(@Path("id") id: ObjectId): Call<User>
 
     @GET("/events/follow/{eventId}")
-    fun subscribeToEvent(@Path("eventId") eventId: ObjectId): Call<ServerResponse>
+    fun subscribeToEvent(@Header("Authorization") token: String, @Path("eventId") eventId: ObjectId): Call<Event>
 
     @POST("/events/")
     fun createEvent(@Body e : CREATE_EVENT_MODEL) : Call<ServerResponse> // set correct queries

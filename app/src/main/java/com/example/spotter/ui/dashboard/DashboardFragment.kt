@@ -2,6 +2,7 @@ package com.example.spotter.ui.dashboard
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.example.spotter.SpotterApp
 import com.example.spotter.databinding.FragmentDashboardBinding
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme
 import com.example.spotter.EventsAdapter
+import com.example.spotter.R
 import com.example.spotter.databinding.FragmentListEventsBinding
 
 class DashboardFragment : Fragment(), EventClickListener {
@@ -27,7 +29,7 @@ class DashboardFragment : Fragment(), EventClickListener {
     private lateinit var eventsAdapter: EventsAdapter
     private lateinit var eventsViewModel : EventViewModel
 
-    private lateinit var events : MutableList<Event>
+    private var events : MutableList<Event> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,8 +43,10 @@ class DashboardFragment : Fragment(), EventClickListener {
         eventsViewModel = (requireActivity().application as SpotterApp).eventsViewModel
 
         eventsViewModel.currentEvents.observe(viewLifecycleOwner, Observer {
-            if (!::events.isInitialized) {
-                eventsAdapter = EventsAdapter(requireContext(), it, this)
+            events.clear()
+            events.addAll(it)
+            if (!::eventsAdapter.isInitialized) {
+                eventsAdapter = EventsAdapter(requireContext(), events, this, myApp.user)
                 binding.recyclerView.layoutManager = LinearLayoutManager(context)
                 binding.recyclerView.adapter = eventsAdapter
             } else {
@@ -53,7 +57,6 @@ class DashboardFragment : Fragment(), EventClickListener {
                     3 -> eventsAdapter.notifyItemChanged(eventsViewModel.index)
                 }
             }
-            events = it
         })
 
         savedInstanceState?.let {
@@ -76,5 +79,9 @@ class DashboardFragment : Fragment(), EventClickListener {
 
     override fun onEventDeleteClick(event: Event) {
         // TODO
+    }
+
+    override fun onSubscribeClick(event: Event) {
+        eventsViewModel.followEvent(event, myApp.user)
     }
 }
