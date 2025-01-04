@@ -27,30 +27,6 @@ data class Event(
     var notifyOn : Boolean = false
 ) : Comparable<Event> {
 
-    init {
-        if (hostObj == null) {
-            RetrofitInstance.api.getUser(host).enqueue(object : Callback<User> {
-                override fun onResponse(
-                    call: Call<User>,
-                    response: Response<User>
-                ) {
-                    if (response.isSuccessful) {
-                        val message = response.body()
-                        Log.i("Output", "ok")
-                        // notify item changed myb
-                    } else {
-                        Log.i("Output", "Error: ${response.code()}")
-                    }
-                }
-
-                override fun onFailure(call: Call<User>, t: Throwable) {
-                    Log.i("Output", "Failed ${t.message}")
-                }
-            })
-        }
-    }
-
-
     override fun compareTo(other: Event): Int {
         return this.time.compareTo(other.time)
     }
@@ -60,7 +36,6 @@ data class Event(
                 "hostObj=$hostObj, score=$score, predicted_count=$predicted_count, __v=$__v, image='$image', " +
                 "notifyOn=$notifyOn)"
     }
-
 }
 
 fun convertToLocalDate(isoDate: String): LocalDate {

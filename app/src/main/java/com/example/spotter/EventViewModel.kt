@@ -112,9 +112,27 @@ class EventViewModel : ViewModel() {
                     val i = currentList.indexOfFirst { it._id == e._id }
                     if (i != -1) {
                         index = i
-                        val updatedList = currentList.toMutableList().apply {this[i] = receivedEvent}
-                        events.value = updatedList
-                        Log.i("Output", "Updated")
+                        if (receivedEvent.hostObj == null) {
+                            RetrofitInstance.api.getUser(receivedEvent.host).enqueue(object : Callback<User> {
+                                override fun onResponse(
+                                    call: Call<User>,
+                                    response: Response<User>
+                                ) {
+                                    if (response.isSuccessful) {
+                                        receivedEvent.hostObj = response.body()
+                                        val updatedList = currentList.toMutableList().apply {this[i] = receivedEvent}
+                                        events.value = updatedList
+                                        Log.i("Output", "Updated")
+                                    } else {
+                                        Log.i("Output", "Error: ${response.code()}")
+                                    }
+                                }
+
+                                override fun onFailure(call: Call<User>, t: Throwable) {
+                                    Log.i("Output", "Failed ${t.message}")
+                                }
+                            })
+                        }
                     }
                 } else {
                     Log.i("Output", "Error: ${response.code()}")
