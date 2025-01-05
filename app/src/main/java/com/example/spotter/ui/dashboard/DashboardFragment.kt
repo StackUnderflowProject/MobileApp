@@ -98,4 +98,8 @@ class DashboardFragment : Fragment(), EventClickListener {
     override fun onSubscribeClick(event: Event) {
         eventsViewModel.followEvent(event, myApp.user)
     }
+
+    override fun onDeleteClick(event: Event) {
+
+    }
 }
