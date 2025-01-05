@@ -24,7 +24,7 @@ interface ApiService {
     fun subscribeToEvent(@Header("Authorization") token: String, @Path("eventId") eventId: ObjectId): Call<Event>
 
     @POST("/events/")
-    fun createEvent(@Body e : CREATE_EVENT_MODEL) : Call<ServerResponse> // set correct queries
+    fun createEvent(@Header("Authorization") token: String, @Body e : CREATE_EVENT_MODEL) : Call<Event> // set correct queries
 
     @POST("/users/login")
     fun login(@Body user: LOGIN_MODEL) : Call<User>

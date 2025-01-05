@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,29 +48,33 @@ class EventViewModel : ViewModel() {
     }
 
 
-    fun addItem(e: Event, callback: (Boolean) -> Unit) {
-        val body = CREATE_EVENT_MODEL(e.name, e.description, e.activity, e.date, e.time, e.location, e.host)
+    fun addItem(e: Event, user: User?, callback: (Boolean) -> Unit) {
+        val body = CREATE_EVENT_MODEL(e.name, e.description, e.activity, e.date.toString(), e.time, e.location, e.host.toString())
 
-        RetrofitInstance.api.createEvent(body).enqueue(object : Callback<ServerResponse> {
+        RetrofitInstance.api.createEvent("Bearer: " + user?.token, body).enqueue(object : Callback<Event> {
             override fun onResponse(
-                call: Call<ServerResponse>,
-                response: Response<ServerResponse>
+                call: Call<Event>,
+                response: Response<Event>
             ) {
                 if (response.isSuccessful) {
-                    val message = response.body()?.message
-                    Log.i("Output", message ?: "no message")
+                    val receivedEvent = response.body()
                     val currentList = events.value.orEmpty().toMutableList()
-                    currentList.add(0, e)
-                    action = 1
-                    events.value = currentList
-                    callback(true)
+                    getHostObj(receivedEvent!!.host) {user ->
+                        if (user != null) receivedEvent.hostObj = user
+                        Log.i("Output", "$user")
+                        currentList.add(receivedEvent)
+                        action = 1
+                        index = currentList.size - 1
+                        events.value = currentList
+                        callback(true)
+                    }
                 } else {
                     Log.i("Output", "createEvent(), Error: ${response.code()}")
                     callback(false)
                 }
             }
 
-            override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
+            override fun onFailure(call: Call<Event>, t: Throwable) {
                 Log.i("Output", "Failed ${t.message}")
                 callback(false)
             }
@@ -113,26 +118,12 @@ class EventViewModel : ViewModel() {
                     if (i != -1) {
                         index = i
                         if (receivedEvent.hostObj == null) {
-                            RetrofitInstance.api.getUser(receivedEvent.host).enqueue(object : Callback<User> {
-                                override fun onResponse(
-                                    call: Call<User>,
-                                    response: Response<User>
-                                ) {
-                                    if (response.isSuccessful) {
-                                        receivedEvent.hostObj = response.body()
-                                        val updatedList = currentList.toMutableList().apply {this[i] = receivedEvent}
-                                        events.value = updatedList
-                                        Log.i("Output", "Updated")
-                                    } else {
-                                        Log.i("Output", "Error: ${response.code()}")
-                                    }
-                                }
-
-                                override fun onFailure(call: Call<User>, t: Throwable) {
-                                    Log.i("Output", "Failed ${t.message}")
-                                }
-                            })
+                            getHostObj(receivedEvent.host) {user ->
+                                if (user != null) receivedEvent.hostObj = user
+                            }
                         }
+                        val updatedList = currentList.toMutableList().apply {this[i] = receivedEvent}
+                        events.value = updatedList
                     }
                 } else {
                     Log.i("Output", "Error: ${response.code()}")
@@ -141,6 +132,28 @@ class EventViewModel : ViewModel() {
 
             override fun onFailure(call: Call<Event>, t: Throwable) {
                 Log.i("Output", "Failed ${t.message}")
+            }
+        })
+    }
+
+    private fun getHostObj(host: ObjectId, callback: (User?) -> Unit) {
+        RetrofitInstance.api.getUser(host).enqueue(object : Callback<User> {
+            override fun onResponse(
+                call: Call<User>,
+                response: Response<User>
+            ) {
+                if (response.isSuccessful) {
+                    callback(response.body())
+                    Log.i("Output", "Updated")
+                } else {
+                    Log.i("Output", "Error: ${response.code()}")
+                    callback(null)
+                }
+            }
+
+            override fun onFailure(call: Call<User>, t: Throwable) {
+                Log.i("Output", "Failed ${t.message}")
+                callback(null)
             }
         })
     }

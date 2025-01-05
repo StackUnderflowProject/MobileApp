@@ -48,4 +48,7 @@
 
     <string name="error_failed_create_event">Failed to create the event!</string>
     <string name="error_empty_field">This field can not be empty</string>
+
+    <!-- fragment_list_events.xml -->
+    <string name="btn_add">POST +</string>
 </resources>

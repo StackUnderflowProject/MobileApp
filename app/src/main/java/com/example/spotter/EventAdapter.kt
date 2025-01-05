@@ -64,6 +64,10 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
             listener.onNotifyButtonClick(event)
         }
 
+        holder.binding.btnDelete.setOnClickListener {
+
+        }
+
         holder.binding.root.setOnClickListener {
             listener.onEventEditClick(event)
         }
