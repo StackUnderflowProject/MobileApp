@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         if (myApp.user == null || myApp.user!!.token.isEmpty() || !myApp.user!!.isLoginValid()) {
             launchFragment(LoginFragment())
         }
-        //launchFragment(AddEventFragment())
 
         val navView: BottomNavigationView = binding.navView
         supportActionBar?.hide() // hides top left page title
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity() {
             binding.loginContainer.visibility = View.VISIBLE
         } else {
             bundle?.let {fragment.arguments = bundle}
-            fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
+            fragmentTransaction.replace(binding.container.id, fragment)
             if (backStack) fragmentTransaction.addToBackStack(null)
         }
 

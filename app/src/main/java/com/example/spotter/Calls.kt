@@ -18,10 +18,10 @@ data class CREATE_EVENT_MODEL(
     val name : String,
     val description : String,
     val activity : String,
-    val date : LocalDate,
+    val date : String,
     val time : String,
     val location : LOCATION,
-    val host : ObjectId
+    val host : String
 ) {}
 
 class GET_ALL_EVENTS_MODEL(

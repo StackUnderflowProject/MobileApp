@@ -12,6 +12,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate
+import com.example.spotter.AddEventFragment
 import com.example.spotter.Event
 import com.example.spotter.EventClickListener
 import com.example.spotter.EventViewModel
@@ -20,6 +23,7 @@ import com.example.spotter.databinding.FragmentDashboardBinding
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme
 import com.example.spotter.EventsAdapter
 import com.example.spotter.R
+import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentListEventsBinding
 
 class DashboardFragment : Fragment(), EventClickListener {
@@ -30,6 +34,7 @@ class DashboardFragment : Fragment(), EventClickListener {
     private lateinit var eventsViewModel : EventViewModel
 
     private var events : MutableList<Event> = mutableListOf()
+    private var scrollIndex = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,17 +61,26 @@ class DashboardFragment : Fragment(), EventClickListener {
                     2 -> eventsAdapter.notifyItemRemoved(eventsViewModel.index)
                     3 -> eventsAdapter.notifyItemChanged(eventsViewModel.index)
                 }
+                if (eventsViewModel.action == 1) scrollIndex = it.size - 1
             }
         })
 
-        savedInstanceState?.let {
-            val eventPosition = savedInstanceState.getInt("eventPosition", -1)
-            if (eventPosition > 0) {
-                binding.recyclerView.smoothScrollToPosition(eventPosition)
-            }
+        binding.btnAdd.setOnClickListener {
+            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+            fragmentTransaction.replace(container!!.id, AddEventFragment())
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
         }
 
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (scrollIndex != -1) {
+            binding.recyclerView.post {binding.recyclerView.layoutManager!!.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), scrollIndex) }
+            scrollIndex = -1
+        }
     }
 
     override fun onNotifyButtonClick(event: Event) {

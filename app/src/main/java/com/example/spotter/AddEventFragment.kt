@@ -22,6 +22,7 @@ import androidx.fragment.app.ListFragment
 import com.example.spotter.databinding.FragmentAddEventBinding
 import com.example.spotter.ui.dashboard.DashboardFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import org.bson.types.ObjectId
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
@@ -118,19 +119,14 @@ class AddEventFragment : Fragment() {
                     binding.inputActivity.text.toString(),
                     convertToLocalDate(binding.inputDate.text.toString()),
                     binding.inputTime.text.toString(),
-                    LOCATION("point", listOf(locationSelected!!.latitude, locationSelected!!.longitude))
+                    LOCATION("point", listOf(locationSelected!!.latitude, locationSelected!!.longitude)),
+                    host = myApp.user?._id ?: ObjectId()
                 )
-                eventsViewModel.addItem(event) { success ->
+                eventsViewModel.addItem(event, myApp.user) { success ->
                     if (success) {
-                        // go to list and scroll to post
-                        val bundle = Bundle()
-                        bundle.putInt("eventPosition", 0)
-                        requireActivity().supportFragmentManager.popBackStack()
-                        requireActivity().supportFragmentManager.popBackStack()
                         (activity as? MainActivity)?.launchFragment(
                             DashboardFragment(),
-                            false,
-                            bundle
+                            false
                         )
                     } else {
                         binding.errorLabel.visibility = View.VISIBLE
@@ -217,12 +213,20 @@ class AddEventFragment : Fragment() {
     }
 
     private fun convertToLocalDate(dateString: String): LocalDate {
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        return try {
-            LocalDate.parse(dateString, formatter)
-        } catch (e: Exception) {
-            Log.i("Output", "Cant format the date field")
-            return LocalDate.of(1970, 1, 1)
+        val regex = Regex("""^(\d{1,2})/(\d{1,2})/(\d{4})$""")
+        val matchResult = regex.matchEntire(dateString)
+
+        return if (matchResult != null) {
+            try {
+                val (day, month, year) = matchResult.destructured
+                LocalDate.of(year.toInt(), month.toInt(), day.toInt())
+            } catch (e: Exception) {
+                Log.i("Output", "Invalid date values in: $dateString")
+                LocalDate.of(1970, 1, 1) // Fallback default date
+            }
+        } else {
+            Log.i("Output", "Invalid date format: $dateString")
+            LocalDate.of(1970, 1, 1) // Fallback default date
         }
     }
 }
