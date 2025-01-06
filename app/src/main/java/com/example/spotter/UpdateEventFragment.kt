@@ -19,6 +19,7 @@ import com.example.spotter.ui.dashboard.DashboardFragment
 import com.example.spotter.ui.home.LocalDateDeserializer
 import com.example.spotter.ui.home.LocalDateSerializer
 import com.example.spotter.ui.home.ObjectIdSerializer
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -35,7 +36,6 @@ class UpdateEventFragment : Fragment() {
     private lateinit var myApp : SpotterApp
     private lateinit var eventsViewModel : EventViewModel
     private lateinit var mapView : MapView
-    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var binding: FragmentUpdateEventBinding
     private lateinit var gson : Gson
 
@@ -146,10 +146,8 @@ class UpdateEventFragment : Fragment() {
                         eventsViewModel.updateItem(newEvent, myApp.user) { success ->
                             binding.dimmer.visibility = View.GONE
                             if (success) {
-                                (activity as? MainActivity)?.launchFragment(
-                                    DashboardFragment(),
-                                    false
-                                )
+                                val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.nav_view)
+                                bottomNavigationView.selectedItemId = R.id.navigation_dashboard
                             } else {
                                 binding.errorLabel.visibility = View.VISIBLE
                             }
