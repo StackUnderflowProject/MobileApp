@@ -146,6 +146,8 @@ class UpdateEventFragment : Fragment() {
                         eventsViewModel.updateItem(newEvent, myApp.user) { success ->
                             binding.dimmer.visibility = View.GONE
                             if (success) {
+                                DashboardFragment.scrollActive = true
+                                DashboardFragment.scrollEvent = event
                                 val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.nav_view)
                                 bottomNavigationView.selectedItemId = R.id.navigation_dashboard
                             } else {

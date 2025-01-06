@@ -33,9 +33,6 @@ class DashboardFragment : Fragment(), EventClickListener {
     private lateinit var eventsAdapter: EventsAdapter
     private lateinit var eventsViewModel : EventViewModel
 
-    private var events : MutableList<Event> = mutableListOf()
-    private var scrollIndex = -1
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,7 +58,6 @@ class DashboardFragment : Fragment(), EventClickListener {
                     2 -> eventsAdapter.notifyItemRemoved(eventsViewModel.index)
                     3 -> eventsAdapter.notifyItemChanged(eventsViewModel.index)
                 }
-                if (eventsViewModel.action == 1) scrollIndex = it.size - 1
             }
         })
 
@@ -77,9 +73,13 @@ class DashboardFragment : Fragment(), EventClickListener {
 
     override fun onStart() {
         super.onStart()
-        if (scrollIndex != -1) {
-            binding.recyclerView.post {binding.recyclerView.layoutManager!!.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), scrollIndex) }
-            scrollIndex = -1
+        if (scrollActive && scrollEvent != null) {
+            val pos = events.indexOfFirst { it._id == scrollEvent!!._id }
+            Log.i("Output", "${events.size}")
+            if (pos != -1) {
+                scrollActive = false
+                binding.recyclerView.post {binding.recyclerView.layoutManager!!.smoothScrollToPosition(binding.recyclerView, RecyclerView.State(), pos) }
+            }
         }
     }
 
@@ -101,5 +101,12 @@ class DashboardFragment : Fragment(), EventClickListener {
 
     override fun onDeleteClick(event: Event) {
 
+    }
+
+    companion object {
+        var scrollActive = false
+        var scrollEvent : Event? = null
+
+        private var events : MutableList<Event> = mutableListOf()
     }
 }
