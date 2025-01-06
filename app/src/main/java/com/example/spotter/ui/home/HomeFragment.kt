@@ -29,19 +29,32 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.example.spotter.AddEventFragment
 import com.example.spotter.Event
 import com.example.spotter.EventViewModel
 import com.example.spotter.R
+import com.example.spotter.RetrofitInstance
 import com.example.spotter.SpotterApp
+import com.example.spotter.UpdateEventFragment
+import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentHomeBinding
 import com.example.spotter.databinding.FragmentImgAiBinding
 import com.example.spotter.getPredictedCount
 import com.example.spotter.uploadImgResults
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonSerializer
 import com.squareup.picasso.Picasso
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.bson.types.ObjectId
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -49,8 +62,11 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import java.lang.reflect.Type
 
 
 class HomeFragment : Fragment() {
@@ -59,7 +75,9 @@ class HomeFragment : Fragment() {
     private lateinit var map : MapView
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var eventsViewModel : EventViewModel
+    private var mainBinding : ActivityMainBinding? = null
     private lateinit var myApp : SpotterApp
+    private lateinit var gson : Gson
 
     private var events : MutableList<Event> = mutableListOf<Event>()
 
@@ -70,6 +88,15 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         myApp = requireActivity().application as SpotterApp
+        val containerParent = container?.parent as? View
+        mainBinding = containerParent?.let { ActivityMainBinding.bind(it) }
+
+        val gsonBuilder = GsonBuilder()
+        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateSerializer())
+        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
+        gsonBuilder.registerTypeAdapter(ObjectId::class.java, ObjectIdSerializer())
+        gsonBuilder.registerTypeAdapter(ObjectId::class.java, RetrofitInstance.ObjectIdDeserializer())
+        gson = gsonBuilder.create()
 
         Configuration.getInstance().load(requireContext(), android.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()))
 
@@ -94,6 +121,19 @@ class HomeFragment : Fragment() {
         eventsViewModel = (requireActivity().application as SpotterApp).eventsViewModel
         eventsViewModel.currentEvents.observe(viewLifecycleOwner, Observer {
             events = it
+
+            if (events.size > 5) {
+                val f = UpdateEventFragment()
+                val b = Bundle()
+                b.putString("updateEvent", gson.toJson(events[5]))
+                Log.i("Output", gson.toJson(events[5]))
+                f.arguments = b
+                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+                fragmentTransaction.replace(container!!.id, f)
+                fragmentTransaction.addToBackStack(null)
+                fragmentTransaction.commit()
+            }
+
             showMarkers()
         })
 
@@ -381,5 +421,26 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+}
+
+class LocalDateDeserializer : JsonDeserializer<LocalDate> {
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): LocalDate {
+        return LocalDate.parse(json?.asString, DateTimeFormatter.ISO_LOCAL_DATE)
+    }
+}
+class LocalDateSerializer : JsonSerializer<LocalDate> {
+    override fun serialize(src: LocalDate?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+        return JsonPrimitive(src?.format(DateTimeFormatter.ISO_LOCAL_DATE))
+    }
+}
+class ObjectIdSerializer : JsonSerializer<ObjectId> {
+    override fun serialize(
+        src: ObjectId?,
+        typeOfSrc: Type?,
+        context: JsonSerializationContext?
+    ): JsonElement {
+        // Return the string representation of the ObjectId
+        return JsonPrimitive(src?.toString() ?: "")
     }
 }

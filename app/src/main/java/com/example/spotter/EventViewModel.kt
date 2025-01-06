@@ -95,15 +95,38 @@ class EventViewModel : ViewModel() {
         events.value = currentList
     }
 
-    fun updateItem(e: Event) {
-        val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it._id == e._id }
-        if (i != -1) {
-            index = i
-            currentList[i] = e
-        }
-        action = 3
-        events.value = currentList
+    fun updateItem(e: Event, user: User?, callback: (Boolean) -> Unit) {
+        val body = CREATE_EVENT_MODEL(e.name, e.description, e.activity, e.date.toString(), e.time, e.location, e.host.toString())
+
+        RetrofitInstance.api.updateEvent("Bearer: " + user?.token, e._id, body).enqueue(object : Callback<Event> {
+            override fun onResponse(
+                call: Call<Event>,
+                response: Response<Event>
+            ) {
+                if (response.isSuccessful) {
+                    val receivedEvent = response.body()
+                    val currentList = events.value.orEmpty().toMutableList()
+                    getHostObj(receivedEvent!!.host) {user ->
+                        if (user != null) receivedEvent.hostObj = user
+                        Log.i("Output", "$user")
+                        action = 3
+                        val i = currentList.indexOfFirst { it._id == e._id }
+                        index = i
+                        currentList[i] = receivedEvent
+                        events.value = currentList
+                        callback(true)
+                    }
+                } else {
+                    Log.i("Output", "createEvent(), Error: ${response.code()}")
+                    callback(false)
+                }
+            }
+
+            override fun onFailure(call: Call<Event>, t: Throwable) {
+                Log.i("Output", "Failed ${t.message}")
+                callback(false)
+            }
+        })
     }
 
     fun followEvent(e: Event, user: User?) {

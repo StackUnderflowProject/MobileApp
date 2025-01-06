@@ -10,6 +10,7 @@ import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 
@@ -30,6 +31,9 @@ interface ApiService {
 
     @POST("/events/")
     fun createEvent(@Header("Authorization") token: String, @Body e : CREATE_EVENT_MODEL) : Call<Event> // set correct queries
+
+    @PUT("/events/{id}")
+    fun updateEvent(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Body e : CREATE_EVENT_MODEL) : Call<Event>
 
     @POST("/users/login")
     fun login(@Body user: LOGIN_MODEL) : Call<User>
