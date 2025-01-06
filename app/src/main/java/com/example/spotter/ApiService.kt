@@ -1,11 +1,16 @@
 package com.example.spotter
 
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ApiService {
@@ -32,4 +37,14 @@ interface ApiService {
     @POST("/users/register")
     fun register(@Body user : REGISTER_MODEL) : Call<User>
 
+    @Multipart
+    @POST("/predict")
+    fun getPredictedCount(@Header("Authorization") token: String,  @Part("density") density: RequestBody, @Part image: MultipartBody.Part) : Call<PREDICT_IMG_OUTPUT>
+
+    @Multipart
+    @POST("/{id}/image")
+    fun uploadEventImg(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Part image: MultipartBody.Part) : Call<ServerResponse>
+
+    @PATCH("/{id}/predicted-count")
+    fun uploadPredictedCount(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Body input: PREDICT_IMG_OUTPUT) : Call<Event>
 }

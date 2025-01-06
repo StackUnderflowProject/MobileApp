@@ -6,6 +6,9 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.Callback
@@ -158,4 +161,69 @@ class EventViewModel : ViewModel() {
         })
     }
 }
+
+fun getPredictedCount(user: User?, event: Event, image: MultipartBody.Part, callback: (Int) -> Unit) {
+    RetrofitInstance2.api.getPredictedCount("Bearer: " + user?.token,  RequestBody.create("text/plain".toMediaTypeOrNull(), "dense"), image).enqueue(object : Callback<PREDICT_IMG_OUTPUT> {
+        override fun onResponse(
+            call: Call<PREDICT_IMG_OUTPUT>,
+            response: Response<PREDICT_IMG_OUTPUT>
+        ) {
+            if (response.isSuccessful) {
+                Log.i("Output", "+ " + response.body()?.toString())
+                val receivedCount = response.body()
+                callback(receivedCount!!.predicted_count)
+            } else {
+                Log.i("Output", "Error: ${response.code()}")
+                callback(-1)
+            }
+        }
+
+        override fun onFailure(call: Call<PREDICT_IMG_OUTPUT>, t: Throwable) {
+            Log.i("Output", "Failed ${t.message}")
+            callback(-1)
+        }
+    })
+}
+
+fun uploadImgResults(user: User?, event: Event, image: MultipartBody.Part, predictedCount: Int, callback: (Event?) -> Unit) {
+    RetrofitInstance.api.uploadEventImg("Bearer: " + user?.token, event._id, image).enqueue(object : Callback<ServerResponse> {
+        override fun onResponse(
+            call: Call<ServerResponse>,
+            response: Response<ServerResponse>
+        ) {
+            if (response.isSuccessful) {
+                Log.i("Output", "+ " + response.body()?.toString())
+                RetrofitInstance.api.uploadPredictedCount("Bearer: " + user?.token, event._id, PREDICT_IMG_OUTPUT(predictedCount)).enqueue(object : Callback<Event> {
+                    override fun onResponse(
+                        call: Call<Event>,
+                        response: Response<Event>
+                    ) {
+                        if (response.isSuccessful) {
+                            Log.i("Output", "+ " + response.body()?.toString())
+                            val receivedEvent = response.body()
+                            callback(receivedEvent)
+                        } else {
+                            Log.i("Output", "Error: ${response.code()}")
+                            callback(null)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Event>, t: Throwable) {
+                        Log.i("Output", "Failed ${t.message}")
+                        callback(null)
+                    }
+                })
+            } else {
+                Log.i("Output", "Error: ${response.code()}")
+                callback(null)
+            }
+        }
+
+        override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
+            Log.i("Output", "Failed ${t.message}")
+            callback(null)
+        }
+    })
+}
+
 

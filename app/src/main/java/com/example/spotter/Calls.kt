@@ -1,5 +1,6 @@
 package com.example.spotter
 
+import okhttp3.MultipartBody
 import org.bson.types.ObjectId
 import java.time.LocalDate
 
@@ -59,4 +60,8 @@ class GET_ALL_EVENTS_MODEL(
 data class LOCATION(
     val type: String,
     val coordinates: List<Double>
+)
+
+data class PREDICT_IMG_OUTPUT(
+    val predicted_count: Int
 )

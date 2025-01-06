@@ -21,7 +21,7 @@ data class Event(
     var followers : MutableList<ObjectId> = mutableListOf<ObjectId>(),
     var hostObj : User? = null,
     val score: String? = "",
-    val predicted_count: Int? = 0,
+    val predicted_count: Int? = -1,
     val __v: Int? = 0,
     val image: String? = "",
     var notifyOn : Boolean = false
