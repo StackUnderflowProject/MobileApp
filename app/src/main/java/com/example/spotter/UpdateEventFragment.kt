@@ -1,12 +1,10 @@
 package com.example.spotter
 
-import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,14 +13,7 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
-import kotlin.random.Random
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.ListFragment
-import com.example.spotter.databinding.ActivityMainBinding
-import com.example.spotter.databinding.FragmentAddEventBinding
 import com.example.spotter.databinding.FragmentUpdateEventBinding
 import com.example.spotter.ui.dashboard.DashboardFragment
 import com.example.spotter.ui.home.LocalDateDeserializer
@@ -33,16 +24,12 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.bson.types.ObjectId
 import org.osmdroid.events.MapEventsReceiver
-import org.osmdroid.events.MapListener
-import org.osmdroid.events.ScrollEvent
-import org.osmdroid.events.ZoomEvent
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class UpdateEventFragment : Fragment() {
     private lateinit var myApp : SpotterApp
@@ -72,7 +59,7 @@ class UpdateEventFragment : Fragment() {
 
                 mapView = binding.map
 
-                Log.i("Output", event.date.year.toString())
+                locationSelected = GeoPoint(event.location.coordinates[1], event.location.coordinates[0])
 
                 binding.inputName.setText(event.name)
                 binding.inputDescription.setText(event.description)
@@ -145,16 +132,19 @@ class UpdateEventFragment : Fragment() {
                     if (binding.inputTime.text.isEmpty()) {timeErrorMsg = getString(R.string.error_empty_field); formOK = false;}
 
                     if (formOK) {
-                        val event = Event(
+                        binding.dimmer.visibility = View.VISIBLE
+                        val newEvent = Event(
                             binding.inputName.text.toString(),
                             binding.inputDescription.text.toString(),
                             binding.inputActivity.text.toString(),
                             convertToLocalDate(binding.inputDate.text.toString()),
                             binding.inputTime.text.toString(),
                             LOCATION("point", listOf(locationSelected!!.latitude, locationSelected!!.longitude)),
-                            host = myApp.user?._id ?: ObjectId()
+                            host = myApp.user?._id ?: ObjectId(),
+                            _id = event._id
                         )
-                        eventsViewModel.updateItem(event, myApp.user) { success ->
+                        eventsViewModel.updateItem(newEvent, myApp.user) { success ->
+                            binding.dimmer.visibility = View.GONE
                             if (success) {
                                 (activity as? MainActivity)?.launchFragment(
                                     DashboardFragment(),
@@ -164,14 +154,6 @@ class UpdateEventFragment : Fragment() {
                                 binding.errorLabel.visibility = View.VISIBLE
                             }
                         }
-
-                        binding.inputName.setText(String())
-                        binding.inputDescription.setText(String())
-                        binding.inputActivity.setText(String())
-                        binding.inputDate.setText(String())
-                        binding.inputTime.setText(String())
-                        binding.errorLabel.visibility = View.GONE
-                        locationSelected = null
                     } else {
                         if (timeErrorMsg.isNotEmpty()) {binding.errorTime.text = timeErrorMsg; binding.errorTime.visibility = View.VISIBLE; binding.errorTime.requestFocus();}
                         if (dateErrorMsg.isNotEmpty()) {binding.errorDate.text = dateErrorMsg; binding.errorDate.visibility = View.VISIBLE; binding.errorDate.requestFocus();}
