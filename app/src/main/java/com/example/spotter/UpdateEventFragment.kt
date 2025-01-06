@@ -38,6 +38,7 @@ class UpdateEventFragment : Fragment() {
     private lateinit var mapView : MapView
     private lateinit var binding: FragmentUpdateEventBinding
     private lateinit var gson : Gson
+    private var globalEvent : Event? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
@@ -56,6 +57,7 @@ class UpdateEventFragment : Fragment() {
             val eventJSON = requireArguments().getString("updateEvent", "")
             if (eventJSON.isNotEmpty()) {
                 val event = gson.fromJson(eventJSON, Event::class.java)
+                globalEvent = event
 
                 mapView = binding.map
 
@@ -148,8 +150,10 @@ class UpdateEventFragment : Fragment() {
                             if (success) {
                                 DashboardFragment.scrollActive = true
                                 DashboardFragment.scrollEvent = event
-                                val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.nav_view)
-                                bottomNavigationView.selectedItemId = R.id.navigation_dashboard
+                                (activity as? MainActivity)?.launchFragment(
+                                    DashboardFragment(),
+                                    false
+                                )
                             } else {
                                 binding.errorLabel.visibility = View.VISIBLE
                             }
@@ -168,6 +172,14 @@ class UpdateEventFragment : Fragment() {
         val backPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (binding.mapContainer.visibility == View.VISIBLE) binding.mapContainer.visibility = View.GONE
+                else {
+                    DashboardFragment.scrollActive = true
+                    DashboardFragment.scrollEvent = globalEvent
+                    (activity as? MainActivity)?.launchFragment(
+                        DashboardFragment(),
+                        false
+                    )
+                }
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)

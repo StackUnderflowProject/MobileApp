@@ -77,7 +77,6 @@ class HomeFragment : Fragment() {
     private lateinit var eventsViewModel : EventViewModel
     private var mainBinding : ActivityMainBinding? = null
     private lateinit var myApp : SpotterApp
-    private lateinit var gson : Gson
 
     private var events : MutableList<Event> = mutableListOf<Event>()
 
@@ -90,13 +89,6 @@ class HomeFragment : Fragment() {
         myApp = requireActivity().application as SpotterApp
         val containerParent = container?.parent as? View
         mainBinding = containerParent?.let { ActivityMainBinding.bind(it) }
-
-        val gsonBuilder = GsonBuilder()
-        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateSerializer())
-        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
-        gsonBuilder.registerTypeAdapter(ObjectId::class.java, ObjectIdSerializer())
-        gsonBuilder.registerTypeAdapter(ObjectId::class.java, RetrofitInstance.ObjectIdDeserializer())
-        gson = gsonBuilder.create()
 
         Configuration.getInstance().load(requireContext(), android.preference.PreferenceManager.getDefaultSharedPreferences(requireContext()))
 
@@ -121,19 +113,6 @@ class HomeFragment : Fragment() {
         eventsViewModel = (requireActivity().application as SpotterApp).eventsViewModel
         eventsViewModel.currentEvents.observe(viewLifecycleOwner, Observer {
             events = it
-
-            if (events.size > 5) {
-                val f = UpdateEventFragment()
-                val b = Bundle()
-                b.putString("updateEvent", gson.toJson(events[5]))
-                Log.i("Output", gson.toJson(events[5]))
-                f.arguments = b
-                val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
-                fragmentTransaction.replace(container!!.id, f)
-                fragmentTransaction.addToBackStack(null)
-                fragmentTransaction.commit()
-            }
-
             showMarkers()
         })
 

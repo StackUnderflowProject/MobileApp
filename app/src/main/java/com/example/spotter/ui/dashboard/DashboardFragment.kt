@@ -23,8 +23,17 @@ import com.example.spotter.databinding.FragmentDashboardBinding
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme
 import com.example.spotter.EventsAdapter
 import com.example.spotter.R
+import com.example.spotter.RetrofitInstance
+import com.example.spotter.UpdateEventFragment
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentListEventsBinding
+import com.example.spotter.ui.home.LocalDateDeserializer
+import com.example.spotter.ui.home.LocalDateSerializer
+import com.example.spotter.ui.home.ObjectIdSerializer
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import org.bson.types.ObjectId
+import java.time.LocalDate
 
 class DashboardFragment : Fragment(), EventClickListener {
 
@@ -32,6 +41,8 @@ class DashboardFragment : Fragment(), EventClickListener {
     private lateinit var myApp : SpotterApp
     private lateinit var eventsAdapter: EventsAdapter
     private lateinit var eventsViewModel : EventViewModel
+    private lateinit var gson : Gson
+    private var containerView: ViewGroup? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,8 +50,16 @@ class DashboardFragment : Fragment(), EventClickListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentListEventsBinding.inflate(inflater, container, false)
+        containerView = container
 
         myApp = requireActivity().application as SpotterApp
+
+        val gsonBuilder = GsonBuilder()
+        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateSerializer())
+        gsonBuilder.registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
+        gsonBuilder.registerTypeAdapter(ObjectId::class.java, ObjectIdSerializer())
+        gsonBuilder.registerTypeAdapter(ObjectId::class.java, RetrofitInstance.ObjectIdDeserializer())
+        gson = gsonBuilder.create()
 
         eventsViewModel = (requireActivity().application as SpotterApp).eventsViewModel
 
@@ -88,7 +107,15 @@ class DashboardFragment : Fragment(), EventClickListener {
     }
 
     override fun onEventEditClick(event: Event) {
-        // TODO
+        if (containerView == null) return
+        val f = UpdateEventFragment()
+        val b = Bundle()
+        b.putString("updateEvent", gson.toJson(event))
+        f.arguments = b
+        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(containerView!!.id, f)
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 
     override fun onEventDeleteClick(event: Event) {

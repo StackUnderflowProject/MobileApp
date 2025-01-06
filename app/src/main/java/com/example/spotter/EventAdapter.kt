@@ -4,6 +4,8 @@ import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.spotter.databinding.FragmentEventBinding
@@ -53,7 +55,22 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         }
 
         holder.binding.btnOptions.setOnClickListener {
-
+            val popupMenu = PopupMenu(context, holder.binding.btnOptions)
+            popupMenu.menuInflater.inflate(R.menu.event_options, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        listener.onEventEditClick(event)
+                        true
+                    }
+                    R.id.action_delete -> {
+                        listener.onEventDeleteClick(event)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
         }
         /*
         holder.binding.btnNotify.text = if (event.notifyOn) context.getString(R.string.will_notify) else context.getString(R.string.notify_me)
