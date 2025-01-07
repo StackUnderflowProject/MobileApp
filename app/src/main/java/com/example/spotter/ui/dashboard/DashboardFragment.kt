@@ -114,7 +114,7 @@ class DashboardFragment : Fragment(), EventClickListener {
         f.arguments = b
         val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(containerView!!.id, f)
-        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.addToBackStack("UpdateEventFragment")
         fragmentTransaction.commit()
     }
 

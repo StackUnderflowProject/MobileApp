@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import java.util.Calendar
 import com.example.spotter.databinding.FragmentUpdateEventBinding
 import com.example.spotter.ui.dashboard.DashboardFragment
@@ -150,10 +151,7 @@ class UpdateEventFragment : Fragment() {
                             if (success) {
                                 DashboardFragment.scrollActive = true
                                 DashboardFragment.scrollEvent = event
-                                (activity as? MainActivity)?.launchFragment(
-                                    DashboardFragment(),
-                                    false
-                                )
+                                requireActivity().supportFragmentManager.popBackStack("UpdateEventFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                             } else {
                                 binding.errorLabel.visibility = View.VISIBLE
                             }
@@ -175,10 +173,7 @@ class UpdateEventFragment : Fragment() {
                 else {
                     DashboardFragment.scrollActive = true
                     DashboardFragment.scrollEvent = globalEvent
-                    (activity as? MainActivity)?.launchFragment(
-                        DashboardFragment(),
-                        false
-                    )
+                    requireActivity().supportFragmentManager.popBackStack("UpdateEventFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 }
             }
         }
