@@ -187,7 +187,7 @@
         app:layout_constraintTop_toTopOf="@+id/btnSubscribe" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imgSubscribers"
         android:layout_width="20dp"
         android:layout_height="19dp"
         android:layout_marginStart="2dp"
@@ -224,5 +224,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/download_removebg_preview__1_" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btnGoToEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#040404"
+        android:text="Go to event ->"
+        android:textColor="#FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -128,7 +128,7 @@ class AddEventFragment : Fragment() {
                         DashboardFragment.scrollEvent = event
                         (activity as? MainActivity)?.launchFragment(
                             DashboardFragment(),
-                            false
+                            null
                         )
                     } else {
                         binding.errorLabel.visibility = View.VISIBLE

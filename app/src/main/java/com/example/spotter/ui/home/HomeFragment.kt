@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -23,27 +25,28 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import com.example.spotter.AddEventFragment
+import androidx.navigation.fragment.findNavController
 import com.example.spotter.Event
+import com.example.spotter.EventClickListener
 import com.example.spotter.EventViewModel
+import com.example.spotter.MainActivity
 import com.example.spotter.R
-import com.example.spotter.RetrofitInstance
 import com.example.spotter.SpotterApp
-import com.example.spotter.UpdateEventFragment
 import com.example.spotter.databinding.ActivityMainBinding
+import com.example.spotter.databinding.FragmentEventBinding
 import com.example.spotter.databinding.FragmentHomeBinding
 import com.example.spotter.databinding.FragmentImgAiBinding
 import com.example.spotter.getPredictedCount
+import com.example.spotter.ui.dashboard.DashboardFragment
 import com.example.spotter.uploadImgResults
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -61,6 +64,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -77,6 +81,11 @@ class HomeFragment : Fragment() {
     private lateinit var eventsViewModel : EventViewModel
     private var mainBinding : ActivityMainBinding? = null
     private lateinit var myApp : SpotterApp
+
+    private var activeEvent : Event? = null
+    private var aiBinding : FragmentImgAiBinding? = null
+
+    private var eventBinding : FragmentEventBinding? = null
 
     private var events : MutableList<Event> = mutableListOf<Event>()
 
@@ -116,11 +125,12 @@ class HomeFragment : Fragment() {
             showMarkers()
         })
 
+        binding.btnClose.setOnClickListener {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
         return binding.root
     }
-
-    private var activeEventAI : Event? = null
-    private var aiBinding : FragmentImgAiBinding? = null
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun showMarkers() {
@@ -136,11 +146,9 @@ class HomeFragment : Fragment() {
                 marker.title = e.name
                 marker.setOnMarkerClickListener { a, b ->
                     run {
-                        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                        } else {
-                            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                        }
+                        activeEvent = e
+                        showEvent()
+                        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
                         return@setOnMarkerClickListener true
                     }
                 }
@@ -153,36 +161,90 @@ class HomeFragment : Fragment() {
         map.invalidate()
     }
 
+    private fun showEvent() {
+        val inflater = LayoutInflater.from(requireContext())
+        eventBinding = FragmentEventBinding.inflate(inflater, binding.sheetContainer, false)
+        binding.sheetContainer.removeAllViews()
+        binding.sheetContainer.addView(eventBinding!!.root)
+
+        eventBinding!!.username.text = activeEvent!!.hostObj?.username ?: "Username not loaded"
+        eventBinding!!.userEmail.text = activeEvent!!.hostObj?.email ?: "Email not loaded"
+        eventBinding!!.eventDate.text = activeEvent!!.date.toString()
+        eventBinding!!.eventTime.text = activeEvent!!.time
+        eventBinding!!.title.text = activeEvent!!.name
+        eventBinding!!.description.text = activeEvent!!.description
+        eventBinding!!.location.text = activeEvent!!.location.toString()
+        eventBinding!!.activity.text = activeEvent!!.activity
+        eventBinding!!.activityIcon.setImageDrawable(
+            when (activeEvent!!.activity.lowercase()) {
+                "nogomet", "futsal", "football" -> ContextCompat.getDrawable(requireContext(), R.drawable.download_removebg_preview__1_)
+                "rokomet", "handball" -> ContextCompat.getDrawable(requireContext(), R.drawable.group_91)
+                else -> ContextCompat.getDrawable(requireContext(), R.drawable.group_92)
+            })
+        eventBinding!!.subscribeCount.visibility = View.GONE
+        eventBinding!!.imgSubscribers.visibility = View.GONE
+
+        if (activeEvent!!.hostObj == null || activeEvent!!.hostObj?.image.isNullOrEmpty()) {
+            eventBinding!!.userIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.download__5__removebg_preview))
+        } else {
+            Picasso.get()
+                .load("http://77.38.76.152:3000/public/images/profile_pictures/" + (activeEvent!!.hostObj?.image ?: ""))
+                .error(ContextCompat.getDrawable(requireContext(), R.drawable.download__5__removebg_preview)!!)
+                .into(eventBinding!!.userIcon)
+        }
+
+        eventBinding!!.btnSubscribe.visibility = View.GONE
+        eventBinding!!.btnOptions.visibility = View.GONE
+
+        eventBinding!!.btnGoToEvent.visibility = View.VISIBLE
+        eventBinding!!.btnGoToEvent.setOnClickListener {
+            DashboardFragment.scrollActive = true
+            DashboardFragment.scrollEvent = activeEvent
+            val navController = findNavController()
+            navController.navigate(R.id.navigation_dashboard)
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
             aiBinding!!.dimmer.visibility = View.VISIBLE
             Toast.makeText(requireContext(), "Photo saved at: ${imageUri.toString()}", Toast.LENGTH_SHORT).show()
             Log.i("SIZE", "${getFileFromUri(requireContext(), imageUri!!)!!.length()}")
-            getPredictedCount(myApp.user, activeEventAI!!, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!) {predictedCount ->
+            getPredictedCount(myApp.user, activeEvent!!, createImagePart(compressImage(getFileFromUri(requireContext(), imageUri!!)))!!) { predictedCount ->
                 if (predictedCount != -1) {
-                    uploadImgResults(myApp.user, activeEventAI as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) {e ->
+                    uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) { e ->
                         if (e != null) {
-                            aiBinding!!.photoFrame.setImageURI(imageUri)
                             aiBinding!!.photoFrame.visibility = View.VISIBLE
                             aiBinding!!.description.text = "Estimated count: $predictedCount"
                             aiBinding!!.btnTakePhoto.text = "RETAKE"
                             aiBinding!!.btnApprove.visibility = View.VISIBLE
+                            aiBinding!!.photoFrame.setImageURI(imageUri)
+                            aiBinding!!.dimmer.visibility = View.GONE
                         }
                     }
                 } else {
                     aiBinding!!.errorAI.text = "Request failed :("
                     aiBinding!!.errorAI.visibility = View.VISIBLE
+                    aiBinding!!.dimmer.visibility = View.GONE
                 }
-                aiBinding!!.dimmer.visibility = View.GONE
             }
         }
     }
 
-    private fun handlePictureUpload(e: Event) {
-        activeEventAI = e
+    private fun handlePictureUpload() {
         aiBinding!!.btnTakePhoto.setOnClickListener {
             requestCameraPermission()
+        }
+        aiBinding!!.btnApprove.setOnClickListener {
+            aiBinding!!.btnApprove.text = "UPLOADING..."
+            uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, activeEvent!!.predicted_count!!) { e ->
+                if (e != null) {
+                    aiBinding!!.btnApprove.text = "SUCCESS"
+                } else {
+                    aiBinding!!.btnApprove.text = "FAILED"
+                }
+            }
         }
     }
 
@@ -238,7 +300,7 @@ class HomeFragment : Fragment() {
                 val buttonWidth = contentWidth
                 val buttonHeight = maxOf(textHeight, iconHeight) + 2 * padding
 
-                // Button coordinates
+                // Button coordinates (center the button at the marker's position)
                 val buttonX = point.x - buttonWidth / 2
                 val buttonY = point.y + 20 // Below marker
 
@@ -267,23 +329,25 @@ class HomeFragment : Fragment() {
 
                 val tapPoint = Point(motionEvent.x.toInt(), motionEvent.y.toInt())
 
-                // Check if the tap is within the button bounds
+                // Get the button's on-screen coordinates
                 val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
                 val markerScreenPoint = Point()
                 mapView.projection.toPixels(markerPosition, markerScreenPoint)
 
-                val buttonX = markerScreenPoint.x - 50 // Adjust to match button position
-                val buttonY = markerScreenPoint.y + 20 // Adjust to match button position
-                val buttonWidth = 100
-                val buttonHeight = 50
+                val buttonX = markerScreenPoint.x - 200 // Adjust to match button position
+                val buttonY = markerScreenPoint.y - 100 // Adjust to match button position
+                val buttonWidth = 400 // Update with dynamic width from button content
+                val buttonHeight = 200 // Update with dynamic height
 
+                // Check if the tap is within the button bounds
                 if (tapPoint.x in buttonX..(buttonX + buttonWidth) && tapPoint.y in buttonY..(buttonY + buttonHeight)) {
+                    activeEvent = e
                     val inflater = LayoutInflater.from(requireContext())
                     aiBinding = FragmentImgAiBinding.inflate(inflater, binding.sheetContainer, false)
                     binding.sheetContainer.removeAllViews()
                     binding.sheetContainer.addView(aiBinding!!.root)
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    handlePictureUpload(e)
+                    handlePictureUpload()
                     return true
                 }
 
@@ -292,6 +356,7 @@ class HomeFragment : Fragment() {
         }
         map.overlays.add(buttonOverlay)
     }
+
     private fun addPredictLabel(e: Event) {
         if (e.predicted_count != null && e.predicted_count > -1) {
             val predictedCountOverlay = object : Overlay() {
@@ -358,6 +423,29 @@ class HomeFragment : Fragment() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
+    }
+    fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val aspectRatio: Float = bitmap.width.toFloat() / bitmap.height.toFloat()
+        var width = maxWidth
+        var height = maxHeight
+        if (bitmap.width > bitmap.height) {
+            height = (width / aspectRatio).toInt()
+        } else {
+            width = (height * aspectRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(bitmap, width, height, false)
+    }
+    fun compressImage(imageFile: File?): File? {
+        if (imageFile == null || !imageFile.exists()) return null
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        val maxWidth = 1024
+        val maxHeight = 1024
+        val resizedBitmap = resizeBitmap(bitmap, maxWidth, maxHeight)
+        val compressedFile = File(requireContext().cacheDir, "compressed_${imageFile.name}")
+        val outputStream = FileOutputStream(compressedFile)
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+        outputStream.close()
+        return compressedFile
     }
     private fun createImageFile(): File {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())

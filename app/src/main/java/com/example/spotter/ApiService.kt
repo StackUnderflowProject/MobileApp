@@ -46,9 +46,9 @@ interface ApiService {
     fun getPredictedCount(@Header("Authorization") token: String,  @Part("density") density: RequestBody, @Part image: MultipartBody.Part) : Call<PREDICT_IMG_OUTPUT>
 
     @Multipart
-    @POST("/{id}/image")
+    @POST("/events/{id}/image")
     fun uploadEventImg(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Part image: MultipartBody.Part) : Call<ServerResponse>
 
-    @PATCH("/{id}/predicted-count")
+    @PATCH("/events/{id}/predicted-count")
     fun uploadPredictedCount(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Body input: PREDICT_IMG_OUTPUT) : Call<Event>
 }

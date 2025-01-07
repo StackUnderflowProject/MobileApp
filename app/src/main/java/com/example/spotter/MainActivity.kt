@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
     }
 
-    fun launchFragment(fragment : Fragment, backStack : Boolean = true, bundle: Bundle? = null) {
+    fun launchFragment(fragment : Fragment, backStack : String? = null, bundle: Bundle? = null) {
         val fragmentTransaction = supportFragmentManager.beginTransaction()
 
         if (fragment is LoginFragment) {
@@ -55,7 +55,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             bundle?.let {fragment.arguments = bundle}
             fragmentTransaction.replace(binding.container.id, fragment)
-            if (backStack) fragmentTransaction.addToBackStack(null)
+            if (backStack != null && backStack.isEmpty()) fragmentTransaction.addToBackStack(null)
+            if (backStack != null && backStack.isNotEmpty()) fragmentTransaction.addToBackStack(backStack)
         }
 
         fragmentTransaction.commit()
