@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -119,7 +120,18 @@ class DashboardFragment : Fragment(), EventClickListener {
     }
 
     override fun onEventDeleteClick(event: Event) {
-        // TODO
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Delete Item")  // Title of the dialog
+        builder.setMessage("Are you sure you want to delete this item?")  // Message asking for confirmation
+        builder.setNegativeButton("Yes") { dialog, which ->
+            eventsViewModel.removeItem(myApp.user, event) {success ->
+                if (!success) Toast.makeText(requireContext(), "Failed to delete event :(", Toast.LENGTH_SHORT).show()
+            }
+        }
+        builder.setPositiveButton("No") { dialog, which ->
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 
     override fun onSubscribeClick(event: Event) {
