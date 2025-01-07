@@ -134,7 +134,10 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun showMarkers() {
+        map.overlays.clear()
+        Log.i("Create", "---------")
         events.forEach { e ->
+            Log.i("Create", "${e.name}")
             run {
                 val marker = Marker(map)
                 marker.position = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
