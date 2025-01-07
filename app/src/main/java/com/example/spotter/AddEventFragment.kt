@@ -124,6 +124,8 @@ class AddEventFragment : Fragment() {
                 )
                 eventsViewModel.addItem(event, myApp.user) { success ->
                     if (success) {
+                        DashboardFragment.scrollActive = true
+                        DashboardFragment.scrollEvent = event
                         (activity as? MainActivity)?.launchFragment(
                             DashboardFragment(),
                             false

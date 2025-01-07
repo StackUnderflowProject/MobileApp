@@ -44,15 +44,25 @@
         app:layout_constraintTop_toTopOf="@+id/userEmail"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/btnOptions"
-        android:layout_width="21dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/userIcon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/userIcon"
-        app:srcCompat="@drawable/download__6__removebg_preview" />
+        android:padding="15dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="0dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="21dp"
+            android:layout_height="32dp"
+            app:srcCompat="@drawable/download__6__removebg_preview" />
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
