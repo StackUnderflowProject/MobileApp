@@ -84,15 +84,33 @@ class EventViewModel : ViewModel() {
         })
     }
 
-    fun removeItem(e: Event) {
-        val currentList = events.value.orEmpty().toMutableList()
-        val i = currentList.indexOfFirst { it._id == e._id }
-        if (i != -1) {
-            index = i
-            currentList.removeAt(i)
-        }
-        action = 2
-        events.value = currentList
+    fun removeItem(user: User?, e: Event, callback: (Boolean) -> Unit) {
+        RetrofitInstance.api.deleteEvent("Bearer: " + user?.token, e._id).enqueue(object : Callback<ServerResponse> {
+            override fun onResponse(
+                call: Call<ServerResponse>,
+                response: Response<ServerResponse>
+            ) {
+                if (response.isSuccessful) {
+                    val currentList = events.value.orEmpty().toMutableList()
+                    val i = currentList.indexOfFirst { it._id == e._id }
+                    if (i != -1) {
+                        index = i
+                        currentList.removeAt(i)
+                    }
+                    action = 2
+                    events.value = currentList
+                    callback(true)
+                } else {
+                    Log.i("Output", "createEvent(), Error: ${response.code()}")
+                    callback(false)
+                }
+            }
+
+            override fun onFailure(call: Call<ServerResponse>, t: Throwable) {
+                Log.i("Output", "Failed ${t.message}")
+                callback(false)
+            }
+        })
     }
 
     fun updateItem(e: Event, user: User?, callback: (Boolean) -> Unit) {

@@ -5,6 +5,7 @@ import okhttp3.RequestBody
 import org.bson.types.ObjectId
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -31,6 +32,9 @@ interface ApiService {
 
     @POST("/events/")
     fun createEvent(@Header("Authorization") token: String, @Body e : CREATE_EVENT_MODEL) : Call<Event> // set correct queries
+
+    @DELETE("/events/{id}")
+    fun deleteEvent(@Header("Authorization") token: String, @Path("id") eventId: ObjectId) : Call<ServerResponse>
 
     @PUT("/events/{id}")
     fun updateEvent(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Body e : CREATE_EVENT_MODEL) : Call<Event>
