@@ -35,13 +35,16 @@ class GET_ALL_EVENTS_MODEL(
     val time: String,
     val host: User,
     val followers: MutableList<ObjectId>,
-    val score: String? = "",
+    var score: String? = "",
     val hostObj: User?,
-    val predicted_count: Int? = 0,
+    var predicted_count: Int? = -1,
     val __v: Int? = 0,
-    val image: String? = ""
+    var image: String? = ""
 ) {
     fun toEvent() : Event {
+        if (predicted_count == null) predicted_count = -1
+        if (image == null) image = ""
+        if (score == null) score = ""
         return Event(
             name,
             description,
@@ -52,7 +55,10 @@ class GET_ALL_EVENTS_MODEL(
             _id,
             host._id,
             followers,
-            hostObj = host
+            hostObj = host,
+            predicted_count = predicted_count,
+            image = image,
+            score = score
         )
     }
 }
