@@ -129,6 +129,16 @@ class HomeFragment : Fragment() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
+        binding.btnFilter.setOnClickListener {
+            binding.containerFilters.visibility = if (binding.containerFilters.visibility == View.GONE) View.VISIBLE else View.GONE
+            binding.btnCloseFilters.visibility = if (binding.btnCloseFilters.visibility == View.GONE) View.VISIBLE else View.GONE
+        }
+
+        binding.btnCloseFilters.setOnClickListener {
+            binding.containerFilters.visibility = View.GONE
+            binding.btnCloseFilters.visibility = View.GONE
+        }
+
         return binding.root
     }
 
