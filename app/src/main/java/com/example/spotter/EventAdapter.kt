@@ -1,6 +1,8 @@
 package com.example.spotter
 
 import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.spotter.databinding.FragmentEventBinding
 import com.squareup.picasso.Picasso
+import java.util.Locale
 
 class EventsAdapter(val context: Context, private val events: List<Event>, private val listener: EventClickListener, private var user: User?) : RecyclerView.Adapter<EventsAdapter.EventViewHolder>() {
 
@@ -30,7 +33,7 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         holder.binding.eventTime.text = event.time
         holder.binding.title.text = event.name
         holder.binding.description.text = event.description
-        holder.binding.location.text = event.location.toString()
+        holder.binding.location.text = getAddressFromCoordinates(event.location.coordinates[0], event.location.coordinates[1]) ?: "Unknown location"
         holder.binding.activity.text = event.activity
         holder.binding.activityIcon.setImageDrawable(
             when (event.activity.lowercase()) {
@@ -98,5 +101,20 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
 
     override fun getItemCount(): Int {
         return events.size
+    }
+
+    private fun getAddressFromCoordinates(latitude: Double, longitude: Double): String? {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        return try {
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            if (!addresses.isNullOrEmpty()) {
+                addresses[0].getAddressLine(0) // Full address
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }
