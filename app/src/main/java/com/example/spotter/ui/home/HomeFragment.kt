@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -62,6 +64,7 @@ import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -208,30 +211,40 @@ class HomeFragment : Fragment() {
             aiBinding!!.dimmer.visibility = View.VISIBLE
             Toast.makeText(requireContext(), "Photo saved at: ${imageUri.toString()}", Toast.LENGTH_SHORT).show()
             Log.i("SIZE", "${getFileFromUri(requireContext(), imageUri!!)!!.length()}")
-            getPredictedCount(myApp.user, activeEvent!!, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!) { predictedCount ->
+            getPredictedCount(myApp.user, activeEvent!!, createImagePart(compressImage(getFileFromUri(requireContext(), imageUri!!)))!!) { predictedCount ->
                 if (predictedCount != -1) {
                     uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) { e ->
                         if (e != null) {
-                            aiBinding!!.photoFrame.setImageURI(imageUri)
                             aiBinding!!.photoFrame.visibility = View.VISIBLE
                             aiBinding!!.description.text = "Estimated count: $predictedCount"
                             aiBinding!!.btnTakePhoto.text = "RETAKE"
                             aiBinding!!.btnApprove.visibility = View.VISIBLE
+                            aiBinding!!.photoFrame.setImageURI(imageUri)
+                            aiBinding!!.dimmer.visibility = View.GONE
                         }
                     }
                 } else {
                     aiBinding!!.errorAI.text = "Request failed :("
                     aiBinding!!.errorAI.visibility = View.VISIBLE
+                    aiBinding!!.dimmer.visibility = View.GONE
                 }
-                aiBinding!!.dimmer.visibility = View.GONE
             }
         }
     }
 
-    private fun handlePictureUpload(e: Event) {
-        activeEvent = e
+    private fun handlePictureUpload() {
         aiBinding!!.btnTakePhoto.setOnClickListener {
             requestCameraPermission()
+        }
+        aiBinding!!.btnApprove.setOnClickListener {
+            aiBinding!!.btnApprove.text = "UPLOADING..."
+            uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, activeEvent!!.predicted_count!!) { e ->
+                if (e != null) {
+                    aiBinding!!.btnApprove.text = "SUCCESS"
+                } else {
+                    aiBinding!!.btnApprove.text = "FAILED"
+                }
+            }
         }
     }
 
@@ -287,7 +300,7 @@ class HomeFragment : Fragment() {
                 val buttonWidth = contentWidth
                 val buttonHeight = maxOf(textHeight, iconHeight) + 2 * padding
 
-                // Button coordinates
+                // Button coordinates (center the button at the marker's position)
                 val buttonX = point.x - buttonWidth / 2
                 val buttonY = point.y + 20 // Below marker
 
@@ -316,23 +329,25 @@ class HomeFragment : Fragment() {
 
                 val tapPoint = Point(motionEvent.x.toInt(), motionEvent.y.toInt())
 
-                // Check if the tap is within the button bounds
+                // Get the button's on-screen coordinates
                 val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
                 val markerScreenPoint = Point()
                 mapView.projection.toPixels(markerPosition, markerScreenPoint)
 
-                val buttonX = markerScreenPoint.x - 50 // Adjust to match button position
-                val buttonY = markerScreenPoint.y + 20 // Adjust to match button position
-                val buttonWidth = 100
-                val buttonHeight = 50
+                val buttonX = markerScreenPoint.x - 200 // Adjust to match button position
+                val buttonY = markerScreenPoint.y - 100 // Adjust to match button position
+                val buttonWidth = 400 // Update with dynamic width from button content
+                val buttonHeight = 200 // Update with dynamic height
 
+                // Check if the tap is within the button bounds
                 if (tapPoint.x in buttonX..(buttonX + buttonWidth) && tapPoint.y in buttonY..(buttonY + buttonHeight)) {
+                    activeEvent = e
                     val inflater = LayoutInflater.from(requireContext())
                     aiBinding = FragmentImgAiBinding.inflate(inflater, binding.sheetContainer, false)
                     binding.sheetContainer.removeAllViews()
                     binding.sheetContainer.addView(aiBinding!!.root)
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                    handlePictureUpload(e)
+                    handlePictureUpload()
                     return true
                 }
 
@@ -341,6 +356,7 @@ class HomeFragment : Fragment() {
         }
         map.overlays.add(buttonOverlay)
     }
+
     private fun addPredictLabel(e: Event) {
         if (e.predicted_count != null && e.predicted_count > -1) {
             val predictedCountOverlay = object : Overlay() {
@@ -407,6 +423,29 @@ class HomeFragment : Fragment() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
+    }
+    fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val aspectRatio: Float = bitmap.width.toFloat() / bitmap.height.toFloat()
+        var width = maxWidth
+        var height = maxHeight
+        if (bitmap.width > bitmap.height) {
+            height = (width / aspectRatio).toInt()
+        } else {
+            width = (height * aspectRatio).toInt()
+        }
+        return Bitmap.createScaledBitmap(bitmap, width, height, false)
+    }
+    fun compressImage(imageFile: File?): File? {
+        if (imageFile == null || !imageFile.exists()) return null
+        val bitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+        val maxWidth = 1024
+        val maxHeight = 1024
+        val resizedBitmap = resizeBitmap(bitmap, maxWidth, maxHeight)
+        val compressedFile = File(requireContext().cacheDir, "compressed_${imageFile.name}")
+        val outputStream = FileOutputStream(compressedFile)
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
+        outputStream.close()
+        return compressedFile
     }
     private fun createImageFile(): File {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
