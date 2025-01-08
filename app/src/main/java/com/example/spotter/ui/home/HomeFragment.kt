@@ -103,6 +103,7 @@ class HomeFragment : Fragment() {
     private val MAX_DISTANCE = 100
     private var circleOverlay: Polygon? = null
     private val filter = Filter()
+    private var programaticSeekbarChange = false
     private lateinit var myLocationOverlay: MyLocationNewOverlay
 
     @SuppressLint("SetTextI18n")
@@ -276,6 +277,7 @@ class HomeFragment : Fragment() {
         map.onResume() // Resume the map
     }
 
+    @SuppressLint("SetTextI18n")
     private fun bindFilterView() {
         binding.btnFilter.setOnClickListener {
             binding.containerFilters.visibility = if (binding.containerFilters.visibility == View.GONE) View.VISIBLE else View.GONE
@@ -285,6 +287,7 @@ class HomeFragment : Fragment() {
 
         binding.seekbarDistance.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (programaticSeekbarChange) {programaticSeekbarChange = false; return;}
                 binding.labelDistance.text = if (progress != 0) "${((progress / 100.0) * MAX_DISTANCE).toInt()}km" else "None"
                 binding.containerFilters.background.alpha = 100
                 val location = if (myLocationOverlay.lastFix != null) GeoPoint(myLocationOverlay.lastFix.latitude, myLocationOverlay.lastFix.longitude) else GeoPoint(46.1512, 14.9955)
@@ -306,6 +309,8 @@ class HomeFragment : Fragment() {
                     map.overlays.remove(circleOverlay)
                     circleOverlay = null
                 }
+                if (filter.isDefault()) binding.btnRestoreDefaults.setBackgroundColor(Color.GRAY)
+                else binding.btnRestoreDefaults.setBackgroundColor(Color.parseColor("#b3b3b3"))
                 refreshMap()
             }
         })
@@ -320,6 +325,8 @@ class HomeFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = itemsCategory[position]
                 filter.category = Category.fromString(selectedItem)
+                if (filter.isDefault()) binding.btnRestoreDefaults.setBackgroundColor(Color.GRAY)
+                else binding.btnRestoreDefaults.setBackgroundColor(Color.parseColor("#b3b3b3"))
                 refreshMap()
             }
 
@@ -338,6 +345,8 @@ class HomeFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedItem = itemsTime[position]
                 filter.time = TimeInterval.fromString(selectedItem)
+                if (filter.isDefault()) binding.btnRestoreDefaults.setBackgroundColor(Color.GRAY)
+                else binding.btnRestoreDefaults.setBackgroundColor(Color.parseColor("#b3b3b3"))
                 refreshMap()
             }
 
@@ -346,6 +355,18 @@ class HomeFragment : Fragment() {
             }
         }
 
+        binding.btnRestoreDefaults.setOnClickListener {
+            if (!filter.isDefault()) {
+                filter.restoreDefaults()
+                binding.spinnerCategory.setSelection(0)
+                binding.spinnerTime.setSelection(0)
+                programaticSeekbarChange = true
+                binding.seekbarDistance.progress = 0
+                binding.labelDistance.text = "None"
+                binding.btnRestoreDefaults.setBackgroundColor(Color.GRAY)
+                refreshMap()
+            }
+        }
 
         binding.btnCloseFilters.setOnClickListener {
             binding.containerFilters.visibility = View.GONE

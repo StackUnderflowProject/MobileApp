@@ -92,6 +92,10 @@ class Filter(
          return true
      }
 
+    fun isDefault(): Boolean {
+        return category == Category.ALL && distance == 0 && time == TimeInterval.ALL
+    }
+
     fun restoreDefaults() {
         category = Category.ALL
         distance = 0
