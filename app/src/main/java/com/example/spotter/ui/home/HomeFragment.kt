@@ -15,6 +15,7 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -24,8 +25,11 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
-import android.widget.PopupMenu
+import android.widget.SeekBar
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,12 +37,13 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.example.spotter.Category
 import com.example.spotter.Event
-import com.example.spotter.EventClickListener
 import com.example.spotter.EventViewModel
-import com.example.spotter.MainActivity
+import com.example.spotter.Filter
 import com.example.spotter.R
 import com.example.spotter.SpotterApp
+import com.example.spotter.TimeInterval
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentEventBinding
 import com.example.spotter.databinding.FragmentHomeBinding
@@ -59,10 +64,13 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.bson.types.ObjectId
 import org.osmdroid.config.Configuration
+import org.osmdroid.util.BoundingBox
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Overlay
+import org.osmdroid.views.overlay.Polygon
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -71,6 +79,9 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.lang.reflect.Type
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 class HomeFragment : Fragment() {
@@ -89,6 +100,12 @@ class HomeFragment : Fragment() {
 
     private var events : MutableList<Event> = mutableListOf<Event>()
 
+    private val MAX_DISTANCE = 100
+    private var circleOverlay: Polygon? = null
+    private val filter = Filter()
+    private lateinit var myLocationOverlay: MyLocationNewOverlay
+
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -104,13 +121,31 @@ class HomeFragment : Fragment() {
         // Initialize the map
         map = binding.map
 
-        showMarkers()
-
         map.setMultiTouchControls(true) // Enable zoom and pan gestures
-        val startPoint = GeoPoint(46.5547, 15.6459)
         val mapController = map.controller
         mapController.setZoom(15.0)
+        val startPoint = GeoPoint(46.1512, 14.9955)
         mapController.setCenter(startPoint)
+
+        val LOCATION_PERMISSION_REQUEST_CODE = 1001
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        }
+
+        myLocationOverlay = MyLocationNewOverlay(map)
+        myLocationOverlay.enableMyLocation()
+
+        myLocationOverlay.runOnFirstFix {
+            val myLocation: Location? = myLocationOverlay.lastFix
+            if (myLocation != null) {
+                val geoPoint = GeoPoint(myLocation.latitude, myLocation.longitude)
+                requireActivity().runOnUiThread {
+                    map.controller.setZoom(15.0)
+                    map.controller.setCenter(geoPoint)
+                    showMyLocation(geoPoint)
+                }
+            }
+        }
 
         val bottomSheet = binding.bottomSheet
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
@@ -122,33 +157,35 @@ class HomeFragment : Fragment() {
         eventsViewModel = (requireActivity().application as SpotterApp).eventsViewModel
         eventsViewModel.currentEvents.observe(viewLifecycleOwner, Observer {
             events = it
-            showMarkers()
+            refreshMap()
         })
 
         binding.btnClose.setOnClickListener {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
-        binding.btnFilter.setOnClickListener {
-            binding.containerFilters.visibility = if (binding.containerFilters.visibility == View.GONE) View.VISIBLE else View.GONE
-            binding.btnCloseFilters.visibility = if (binding.btnCloseFilters.visibility == View.GONE) View.VISIBLE else View.GONE
-        }
-
-        binding.btnCloseFilters.setOnClickListener {
-            binding.containerFilters.visibility = View.GONE
-            binding.btnCloseFilters.visibility = View.GONE
-        }
+        bindFilterView()
 
         return binding.root
+    }
+
+    private fun refreshMap() {
+        map.overlays.clear()
+        map.overlays.add(myLocationOverlay)
+        showMarkers()
+        val myLocation: Location? = myLocationOverlay.lastFix
+        if (myLocation != null) showMyLocation(GeoPoint(myLocation.latitude, myLocation.longitude))
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun showMarkers() {
         map.overlays.clear()
-        Log.i("Create", "---------")
+        var startPos = GeoPoint(46.1512, 14.9955)
+        val myLocation: Location? = myLocationOverlay.lastFix
+        if (myLocation != null) startPos = GeoPoint(myLocation.latitude, myLocation.longitude)
         events.forEach { e ->
-            Log.i("Create", "${e.name}")
             run {
+                if (!filter.isEventOk(startPos, e)) return@run
                 val marker = Marker(map)
                 marker.position = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -218,47 +255,15 @@ class HomeFragment : Fragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
-            aiBinding!!.dimmer.visibility = View.VISIBLE
-            Toast.makeText(requireContext(), "Photo saved at: ${imageUri.toString()}", Toast.LENGTH_SHORT).show()
-            Log.i("SIZE", "${getFileFromUri(requireContext(), imageUri!!)!!.length()}")
-            getPredictedCount(myApp.user, activeEvent!!, createImagePart(compressImage(getFileFromUri(requireContext(), imageUri!!)))!!) { predictedCount ->
-                if (predictedCount != -1) {
-                    uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) { e ->
-                        if (e != null) {
-                            aiBinding!!.photoFrame.visibility = View.VISIBLE
-                            aiBinding!!.description.text = "Estimated count: $predictedCount"
-                            aiBinding!!.btnTakePhoto.text = "RETAKE"
-                            aiBinding!!.btnApprove.visibility = View.VISIBLE
-                            aiBinding!!.photoFrame.setImageURI(imageUri)
-                            aiBinding!!.dimmer.visibility = View.GONE
-                        }
-                    }
-                } else {
-                    aiBinding!!.errorAI.text = "Request failed :("
-                    aiBinding!!.errorAI.visibility = View.VISIBLE
-                    aiBinding!!.dimmer.visibility = View.GONE
-                }
-            }
-        }
-    }
+    private fun showMyLocation(p : GeoPoint) {
+        val marker = Marker(map)
+        marker.position = p
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
 
-    private fun handlePictureUpload() {
-        aiBinding!!.btnTakePhoto.setOnClickListener {
-            requestCameraPermission()
-        }
-        aiBinding!!.btnApprove.setOnClickListener {
-            aiBinding!!.btnApprove.text = "UPLOADING..."
-            uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, activeEvent!!.predicted_count!!) { e ->
-                if (e != null) {
-                    aiBinding!!.btnApprove.text = "SUCCESS"
-                } else {
-                    aiBinding!!.btnApprove.text = "FAILED"
-                }
-            }
-        }
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.mylocation_marker)
+        marker.icon = drawable
+
+        map.overlays.add(marker)
     }
 
     override fun onPause() {
@@ -270,6 +275,138 @@ class HomeFragment : Fragment() {
         super.onResume()
         map.onResume() // Resume the map
     }
+
+    private fun bindFilterView() {
+        binding.btnFilter.setOnClickListener {
+            binding.containerFilters.visibility = if (binding.containerFilters.visibility == View.GONE) View.VISIBLE else View.GONE
+            binding.btnCloseFilters.visibility = if (binding.btnCloseFilters.visibility == View.GONE) View.VISIBLE else View.GONE
+            binding.labelDistance.text = "${((binding.seekbarDistance.progress / 100.0) * MAX_DISTANCE).toInt()}km"
+        }
+
+        binding.seekbarDistance.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                binding.labelDistance.text = if (progress != 0) "${((progress / 100.0) * MAX_DISTANCE).toInt()}km" else "None"
+                binding.containerFilters.background.alpha = 100
+                val location = if (myLocationOverlay.lastFix != null) GeoPoint(myLocationOverlay.lastFix.latitude, myLocationOverlay.lastFix.longitude) else GeoPoint(46.1512, 14.9955)
+                map.controller.setCenter(location)
+                setZoomForCircle(map, location, (progress / 100.0) * MAX_DISTANCE)
+                circleOverlay?.let {
+                    map.overlays.remove(circleOverlay)
+                    circleOverlay = null
+                }
+                drawCircleOnMap(map, location, (progress / 100.0) * MAX_DISTANCE)
+                filter.distance = ((progress / 100.0) * MAX_DISTANCE).toInt()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                binding.containerFilters.background.alpha = 255
+                circleOverlay?.let {
+                    map.overlays.remove(circleOverlay)
+                    circleOverlay = null
+                }
+                refreshMap()
+            }
+        })
+
+        val spinnerCategory: Spinner = binding.spinnerCategory
+        val itemsCategory = listOf("All", "Football", "Handball", "Other")
+        val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, itemsCategory)
+        adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategory.adapter = adapterCategory
+
+        spinnerCategory.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = itemsCategory[position]
+                filter.category = Category.fromString(selectedItem)
+                refreshMap()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Handle no selection
+            }
+        }
+
+        val spinnerTime: Spinner = binding.spinnerTime
+        val itemsTime = listOf("All", "Upcoming", "Today", "Week", "Month")
+        val adapterTime = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, itemsTime)
+        adapterTime.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerTime.adapter = adapterTime
+
+        spinnerTime.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedItem = itemsTime[position]
+                filter.time = TimeInterval.fromString(selectedItem)
+                refreshMap()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Handle no selection
+            }
+        }
+
+
+        binding.btnCloseFilters.setOnClickListener {
+            binding.containerFilters.visibility = View.GONE
+            binding.btnCloseFilters.visibility = View.GONE
+        }
+    }
+    private fun drawCircleOnMap(map: MapView, center: GeoPoint, radius: Double) {
+        val circle = Polygon(map).apply {
+            outlinePaint.color = android.graphics.Color.BLUE
+            outlinePaint.strokeWidth = 4f
+            fillPaint.color = android.graphics.Color.argb(50, 0, 0, 255) // 50% transparent blue
+        }
+        circleOverlay = circle
+
+        val points = calculateCirclePoints(center, radius * 1000)
+        circle.points = points
+
+        map.overlays.add(circleOverlay)
+        map.invalidate()
+    }
+    private fun calculateCirclePoints(center: GeoPoint, radiusInMeters: Double, numPoints: Int = 360): List<GeoPoint> {
+        val earthRadius = 6371000.0 // Radius of the Earth in meters
+        val points = mutableListOf<GeoPoint>()
+
+        val radiusInRadians = radiusInMeters / earthRadius
+
+        val centerLatRadians = Math.toRadians(center.latitude)
+        val centerLonRadians = Math.toRadians(center.longitude)
+
+        for (i in 0 until numPoints) {
+            val angle = 2 * PI * i / numPoints // Angle in radians
+
+            val lat = Math.asin(
+                sin(centerLatRadians) * cos(radiusInRadians) +
+                        cos(centerLatRadians) * sin(radiusInRadians) * cos(angle)
+            )
+            val lon = centerLonRadians + Math.atan2(
+                sin(angle) * sin(radiusInRadians) * cos(centerLatRadians),
+                cos(radiusInRadians) - sin(centerLatRadians) * sin(lat)
+            )
+            points.add(GeoPoint(Math.toDegrees(lat), Math.toDegrees(lon)))
+        }
+
+        points.add(points[0])
+        return points
+    }
+    private fun setZoomForCircle(mapView: MapView, center: GeoPoint, radiusParam: Double) {
+        var radius = radiusParam
+        if (radiusParam == 0.0) radius = 300.0
+
+        val radiusInDegrees = (radius * 1000) / 111320.0 // 1 degree latitude ≈ 111.32 km
+
+        val north = center.latitude + radiusInDegrees
+        val south = center.latitude - radiusInDegrees
+        val east = center.longitude + (radiusInDegrees / Math.cos(Math.toRadians(center.latitude)))
+        val west = center.longitude - (radiusInDegrees / Math.cos(Math.toRadians(center.latitude)))
+
+        val boundingBox = BoundingBox(north, east, south, west)
+        mapView.zoomToBoundingBox(boundingBox, true) // 'true' for animated zoom
+    }
+
 
     private fun addPredictButton(e: Event) {
         val buttonOverlay = object : Overlay() {
@@ -369,7 +506,6 @@ class HomeFragment : Fragment() {
         }
         map.overlays.add(buttonOverlay)
     }
-
     private fun addPredictLabel(e: Event) {
         if (e.predicted_count != null && e.predicted_count > -1) {
             val predictedCountOverlay = object : Overlay() {
@@ -418,7 +554,47 @@ class HomeFragment : Fragment() {
             map.overlays.add(predictedCountOverlay)
         }
     }
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
+            aiBinding!!.dimmer.visibility = View.VISIBLE
+            Toast.makeText(requireContext(), "Photo saved at: ${imageUri.toString()}", Toast.LENGTH_SHORT).show()
+            Log.i("SIZE", "${getFileFromUri(requireContext(), imageUri!!)!!.length()}")
+            getPredictedCount(myApp.user, activeEvent!!, createImagePart(compressImage(getFileFromUri(requireContext(), imageUri!!)))!!) { predictedCount ->
+                if (predictedCount != -1) {
+                    uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) { e ->
+                        if (e != null) {
+                            aiBinding!!.photoFrame.visibility = View.VISIBLE
+                            aiBinding!!.description.text = "Estimated count: $predictedCount"
+                            aiBinding!!.btnTakePhoto.text = "RETAKE"
+                            aiBinding!!.btnApprove.visibility = View.VISIBLE
+                            aiBinding!!.photoFrame.setImageURI(imageUri)
+                            aiBinding!!.dimmer.visibility = View.GONE
+                        }
+                    }
+                } else {
+                    aiBinding!!.errorAI.text = "Request failed :("
+                    aiBinding!!.errorAI.visibility = View.VISIBLE
+                    aiBinding!!.dimmer.visibility = View.GONE
+                }
+            }
+        }
+    }
+    private fun handlePictureUpload() {
+        aiBinding!!.btnTakePhoto.setOnClickListener {
+            requestCameraPermission()
+        }
+        aiBinding!!.btnApprove.setOnClickListener {
+            aiBinding!!.btnApprove.text = "UPLOADING..."
+            uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, activeEvent!!.predicted_count!!) { e ->
+                if (e != null) {
+                    aiBinding!!.btnApprove.text = "SUCCESS"
+                } else {
+                    aiBinding!!.btnApprove.text = "FAILED"
+                }
+            }
+        }
+    }
     private val CAMERA_REQUEST_CODE = 100
     private fun requestCameraPermission() {
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
