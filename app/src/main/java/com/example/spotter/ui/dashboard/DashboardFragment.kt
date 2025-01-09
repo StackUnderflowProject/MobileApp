@@ -35,6 +35,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.bson.types.ObjectId
 import java.time.LocalDate
+import java.util.UUID
 
 class DashboardFragment : Fragment(), EventClickListener {
 
@@ -71,6 +72,16 @@ class DashboardFragment : Fragment(), EventClickListener {
                 eventsAdapter = EventsAdapter(requireContext(), events, this, myApp.user)
                 binding.recyclerView.layoutManager = LinearLayoutManager(context)
                 binding.recyclerView.adapter = eventsAdapter
+                val eventId = arguments?.getString("eventNotifcation")
+                eventId?.let { id ->
+                    val eventId = ObjectId(id)
+                    val position = events.indexOfFirst { it._id == eventId }
+                    if (position != -1) {
+                        binding.recyclerView.post {
+                            binding.recyclerView.scrollToPosition(position)
+                        }
+                    }
+                }
             } else {
                 when (eventsViewModel.action) {
                     0 -> eventsAdapter.notifyDataSetChanged()
@@ -103,10 +114,6 @@ class DashboardFragment : Fragment(), EventClickListener {
         }
     }
 
-    override fun onNotifyButtonClick(event: Event) {
-        // TODO
-    }
-
     override fun onEventEditClick(event: Event) {
         if (containerView == null) return
         val f = UpdateEventFragment()
@@ -136,6 +143,7 @@ class DashboardFragment : Fragment(), EventClickListener {
 
     override fun onSubscribeClick(event: Event) {
         eventsViewModel.followEvent(event, myApp.user)
+        myApp.scheduleNotification(event)
     }
 
     override fun onDeleteClick(event: Event) {
