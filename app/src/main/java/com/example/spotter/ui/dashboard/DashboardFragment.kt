@@ -138,6 +138,7 @@ class DashboardFragment : Fragment(), EventClickListener {
         builder.setNegativeButton("Yes") { dialog, which ->
             eventsViewModel.removeItem(myApp.user, event) {success ->
                 if (!success) Toast.makeText(requireContext(), "Failed to delete event :(", Toast.LENGTH_SHORT).show()
+                else myApp.sendDeleteEventOnSocket()
             }
         }
         builder.setPositiveButton("No") { dialog, which ->

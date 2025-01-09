@@ -131,6 +131,7 @@ class AddEventFragment : Fragment() {
                             DashboardFragment(),
                             null
                         )*/
+                        myApp.sendCreateEventOnSocket()
                         requireActivity().supportFragmentManager.popBackStack("AddEventFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                     } else {
                         binding.errorLabel.visibility = View.VISIBLE

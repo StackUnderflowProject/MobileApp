@@ -58,5 +58,6 @@ dependencies {
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    implementation(libs.socket.socket.io.client)
     androidTestImplementation(libs.androidx.espresso.core)
 }

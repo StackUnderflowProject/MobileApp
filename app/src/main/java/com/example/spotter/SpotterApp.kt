@@ -18,7 +18,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
-class SpotterApp : Application() {
+class SpotterApp : Application(), WebsocketListener  {
     private val viewModelStore = ViewModelStore()
     val eventsViewModel: EventViewModel by lazy {
         ViewModelProvider(ViewModelStore(), ViewModelProvider.NewInstanceFactory())[EventViewModel::class.java]
@@ -33,7 +33,31 @@ class SpotterApp : Application() {
 
     override fun onTerminate() {
         super.onTerminate()
+        if (webSocketManager != null) webSocketManager!!.disconnectWebSocket()
         viewModelStore.clear()
+    }
+
+    var webSocketManager: WebSocketManager? = null
+
+    fun initializeWebSocket() {
+        if (user == null || webSocketManager != null) return
+        webSocketManager = WebSocketManager()
+        webSocketManager!!.connectWebSocket(user!!.token, this)
+    }
+
+    fun sendCreateEventOnSocket() {
+        if (user == null || webSocketManager == null) return
+        val jwtToken = user!!.token
+        webSocketManager!!.emitCreateEvent(jwtToken)
+    }
+
+    fun sendDeleteEventOnSocket() {
+        if (user == null || webSocketManager == null) return
+        webSocketManager!!.emitDeleteEvent()
+    }
+
+    override fun onChange() {
+        eventsViewModel.getAllEvents(this)
     }
 
     fun storeUser(context: Context, user: User) {

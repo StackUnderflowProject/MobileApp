@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         myApp.user = myApp.getUser(this)
         if (myApp.user == null || myApp.user!!.token.isEmpty() || !myApp.user!!.isLoginValid()) {
             launchFragment(LoginFragment())
+        } else {
+            myApp.initializeWebSocket()
         }
 
         val navView: BottomNavigationView = binding.navView
