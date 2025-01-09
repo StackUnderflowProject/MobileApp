@@ -59,11 +59,12 @@ class MainActivity : AppCompatActivity() {
 
         if (fragment is LoginFragment) {
             fragmentTransaction.replace(binding.loginContainer.id, fragment)
+            fragmentTransaction.addToBackStack(null)
             binding.navView.visibility = View.GONE
             binding.loginContainer.visibility = View.VISIBLE
         } else {
             bundle?.let {fragment.arguments = bundle}
-            fragmentTransaction.replace(binding.container.id, fragment)
+            fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
             if (backStack != null && backStack.isEmpty()) fragmentTransaction.addToBackStack(null)
             if (backStack != null && backStack.isNotEmpty()) fragmentTransaction.addToBackStack(backStack)
         }
