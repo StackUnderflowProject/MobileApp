@@ -23,6 +23,7 @@ import com.example.spotter.SpotterApp
 import com.example.spotter.databinding.FragmentDashboardBinding
 import org.osmdroid.views.overlay.simplefastpoint.SimplePointTheme
 import com.example.spotter.EventsAdapter
+import com.example.spotter.MainActivity
 import com.example.spotter.R
 import com.example.spotter.RetrofitInstance
 import com.example.spotter.UpdateEventFragment
@@ -93,10 +94,12 @@ class DashboardFragment : Fragment(), EventClickListener {
         })
 
         binding.btnAdd.setOnClickListener {
-            val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
-            fragmentTransaction.replace(container!!.id, AddEventFragment())
-            fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()
+            /*
+            val fragmenttransaction = requireactivity().supportfragmentmanager.begintransaction()
+            fragmenttransaction.replace(.id, addeventfragment())
+            fragmenttransaction.addtobackstack(null)
+            fragmenttransaction.commit()*/
+            (requireActivity() as MainActivity).launchFragment(AddEventFragment(), "AddEventFragment")
         }
 
         return binding.root
@@ -120,10 +123,12 @@ class DashboardFragment : Fragment(), EventClickListener {
         val b = Bundle()
         b.putString("updateEvent", gson.toJson(event))
         f.arguments = b
+        /*
         val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
         fragmentTransaction.replace(containerView!!.id, f)
         fragmentTransaction.addToBackStack("UpdateEventFragment")
-        fragmentTransaction.commit()
+        fragmentTransaction.commit()*/
+        (requireActivity() as MainActivity).launchFragment(f, "UpdateEventFragment")
     }
 
     override fun onEventDeleteClick(event: Event) {

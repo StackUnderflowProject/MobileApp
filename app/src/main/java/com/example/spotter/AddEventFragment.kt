@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import java.text.SimpleDateFormat
@@ -126,10 +127,11 @@ class AddEventFragment : Fragment() {
                     if (success) {
                         DashboardFragment.scrollActive = true
                         DashboardFragment.scrollEvent = event
-                        (activity as? MainActivity)?.launchFragment(
+                        /*(activity as? MainActivity)?.launchFragment(
                             DashboardFragment(),
                             null
-                        )
+                        )*/
+                        requireActivity().supportFragmentManager.popBackStack("AddEventFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                     } else {
                         binding.errorLabel.visibility = View.VISIBLE
                     }
@@ -150,6 +152,14 @@ class AddEventFragment : Fragment() {
                 if (nameErrorMsg.isNotEmpty()) {binding.errorName.text = nameErrorMsg; binding.errorName.visibility = View.VISIBLE; binding.errorName.requestFocus();}
             }
         }
+
+        // override back press
+        val backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().supportFragmentManager.popBackStack("AddEventFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
 
         return binding.root
     }

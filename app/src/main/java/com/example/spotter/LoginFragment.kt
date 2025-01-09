@@ -5,9 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.databinding.FragmentLoginBinding
+import com.example.spotter.ui.dashboard.DashboardFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -56,9 +59,12 @@ class LoginFragment : Fragment() {
                             mainBinding!!.loginContainer.visibility = View.GONE
                             mainBinding!!.navView.visibility = View.VISIBLE
                         }
+                        // clear the entire stack
+                        requireActivity().supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                        /*
                         val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction()
                         fragmentTransaction.remove(requireActivity().supportFragmentManager.findFragmentById(R.id.loginContainer)!!)
-                        fragmentTransaction.commit()
+                        fragmentTransaction.commit()*/
                     } else {
                         if (code == 1) errorLogin.text = getString(R.string.error_failed_login)
                         if (code == 2) errorLogin.text = getString(R.string.error_unable_to_connect_to_server)
@@ -81,6 +87,14 @@ class LoginFragment : Fragment() {
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
+
+        // don't allow the back button navigation to main activity
+        val backPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (requireActivity().supportFragmentManager.backStackEntryCount > 1) requireActivity().onBackPressed()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedCallback)
 
         return binding.root
     }
