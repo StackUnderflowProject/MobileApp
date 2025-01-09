@@ -21,10 +21,12 @@ squareupLoggingInterceptor = "4.11.0"
 squareupPicasso = "2.71828"
 playServicesMaps = "19.0.0"
 securityCryptoKtx = "1.0.0"
+workRuntimeKtx = "2.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCryptoKtx" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 com-github-bumptech-glide-glide = { module = "com.github.bumptech.glide:glide", version.ref = "githubGlide" }
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "githubGlide" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }

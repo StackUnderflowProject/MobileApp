@@ -11,6 +11,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.spotter.databinding.ActivityMainBinding
+import com.example.spotter.ui.dashboard.DashboardFragment
+import org.bson.types.ObjectId
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,6 +45,13 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        val eventId = intent?.getStringExtra("eventNotifcation")
+        if (eventId != null && savedInstanceState == null) {
+            // Navigate to DashboardFragment with the eventId
+            val bundle = Bundle().apply { putString("eventNotifcation", eventId) }
+            navController.navigate(R.id.navigation_dashboard, bundle)
+        }
     }
 
     fun launchFragment(fragment : Fragment, backStack : String? = null, bundle: Bundle? = null) {
