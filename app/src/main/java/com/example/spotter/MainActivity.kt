@@ -6,12 +6,17 @@ import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.spotter.databinding.ActivityMainBinding
 import com.example.spotter.ui.dashboard.DashboardFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.bson.types.ObjectId
 
 class MainActivity : AppCompatActivity() {
@@ -47,6 +52,15 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(60)
+                    supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                }
+            }
+        }
 
         val eventId = intent?.getStringExtra("eventNotifcation")
         if (eventId != null && savedInstanceState == null) {
