@@ -26,6 +26,8 @@
     <string name="error_passwords_not_matching">Gesli se morata ujemati!</string>
     <string name="error_unable_to_connect_to_server">Povezava s strežnikom ni uspela :(</string>
     <string name="error_failed_login">Napačno uporabniško ime ali geslo!</string>
+    <string name="user_w_username_exists">Uporabnik s tem uporabniškim imenom že obstaja!</string>
+
 
     <!-- fragment_add_event.xml -->
     <string name="title_add_event">Ustvari dogodek</string>

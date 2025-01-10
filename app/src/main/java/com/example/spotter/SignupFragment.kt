@@ -55,7 +55,7 @@ class SignupFragment : Fragment() {
                     if (code == 0) {
                         launchLogin(inputUsername.text.toString())
                     } else {
-                        if (code == 1) errorSignup.text = getString(R.string.error_failed_login)
+                        if (code == 1) errorSignup.text = getString(R.string.user_w_username_exists)
                         if (code == 2) errorSignup.text = getString(R.string.error_unable_to_connect_to_server)
                         errorSignup.visibility = View.VISIBLE
                     }
