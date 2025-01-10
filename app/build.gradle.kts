@@ -47,7 +47,7 @@ dependencies {
     implementation(libs.squareup.picasso)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.osmdroid.android)
+    implementation(libs.osmdroid.android.v6114)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

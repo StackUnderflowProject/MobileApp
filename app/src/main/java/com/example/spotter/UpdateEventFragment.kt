@@ -216,6 +216,7 @@ class UpdateEventFragment : Fragment() {
         ))
         marker.icon = scaledDrawable
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.infoWindow = null
         mapView.overlays.add(marker)
     }
 

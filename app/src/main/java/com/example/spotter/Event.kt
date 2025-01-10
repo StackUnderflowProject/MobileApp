@@ -45,7 +45,7 @@ data class Event(
         val hours = timeParts[0].toInt()
         val minutes = timeParts[1].toInt()
         val timeDiff = date.atTime(LocalTime.of(hours, minutes)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis()
-        return timeDiff > 0 && timeDiff < (3600000) || timeDiff < 0 && timeDiff > (-5 * 3600000)
+        return timeDiff < 0 && timeDiff > (-3600000) || timeDiff > 0 && timeDiff < (5 * 3600000)
     }
 }
 

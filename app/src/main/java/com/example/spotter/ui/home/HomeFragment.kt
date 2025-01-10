@@ -191,9 +191,17 @@ class HomeFragment : Fragment() {
                 val marker = Marker(map)
                 marker.position = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                marker.infoWindow = null
 
-                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.marker_activity)
-                marker.icon = drawable
+                val drawable = ContextCompat.getDrawable(requireContext(),
+                    when (e.activity.lowercase()) {
+                        "nogomet", "futsal", "football" -> R.drawable.marker_football
+                        "rokomet", "handball" -> R.drawable.marker_handball
+                        else -> R.drawable.marker_activity
+                    }
+                )
+                val scaledIcon = BitmapDrawable(resources, Bitmap.createScaledBitmap((drawable as BitmapDrawable).bitmap, 42, 62, false))
+                marker.icon = scaledIcon
 
                 marker.title = e.name
                 marker.setOnMarkerClickListener { a, b ->
@@ -264,9 +272,12 @@ class HomeFragment : Fragment() {
             val marker = Marker(map)
             marker.position = p
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.infoWindow = null
 
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.mylocation_marker)
-            marker.icon = drawable
+            val scaledIcon = BitmapDrawable(resources, Bitmap.createScaledBitmap((drawable as BitmapDrawable).bitmap, 32, 40, false))
+
+            marker.icon = scaledIcon
 
             map.overlays.add(marker)
         }
