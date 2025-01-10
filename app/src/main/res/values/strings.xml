@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Spotter</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_discover">Discover</string>
+    <string name="title_user_profile">Profile</string>
 
     <!-- fragment_login.xml / fragment_login.xml -->
     <string name="title_login">Login</string>
