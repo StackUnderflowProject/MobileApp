@@ -20,7 +20,7 @@
             android:layout_marginTop="15dp"
             android:text="@string/title_add_event"
             android:textSize="26sp"
-            android:textColor="@color/white"
+            android:textColor="@color/light_purple"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
@@ -42,7 +42,6 @@
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="#5E5E5E"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHeight_percent="0.7">
 
@@ -139,7 +138,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-
                         android:text="@string/create_event"
                         app:layout_constraintEnd_toStartOf="@+id/guideline6"
                         app:layout_constraintStart_toStartOf="@+id/guideline5"

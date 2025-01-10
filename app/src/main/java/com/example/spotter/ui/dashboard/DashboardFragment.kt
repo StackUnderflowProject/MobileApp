@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerViewAccessibilityDelegate
 import com.example.spotter.AddEventFragment
+import com.example.spotter.CustomItemDecoration
 import com.example.spotter.Event
 import com.example.spotter.EventClickListener
 import com.example.spotter.EventViewModel
@@ -71,6 +73,8 @@ class DashboardFragment : Fragment(), EventClickListener {
             events.addAll(it)
             if (!::eventsAdapter.isInitialized) {
                 eventsAdapter = EventsAdapter(requireContext(), events, this, myApp.user)
+                val itemDecoration = CustomItemDecoration(10, ContextCompat.getColor(requireContext(), R.color.gap_color))
+                binding.recyclerView.addItemDecoration(itemDecoration)
                 binding.recyclerView.layoutManager = LinearLayoutManager(context)
                 binding.recyclerView.adapter = eventsAdapter
                 val eventId = arguments?.getString("eventNotifcation")
@@ -133,14 +137,14 @@ class DashboardFragment : Fragment(), EventClickListener {
 
     override fun onEventDeleteClick(event: Event) {
         val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Delete Item")  // Title of the dialog
-        builder.setMessage("Are you sure you want to delete this item?")  // Message asking for confirmation
-        builder.setNegativeButton("Yes") { dialog, which ->
+        builder.setTitle(getString(R.string.delete_item))  // Title of the dialog
+        builder.setMessage(getString(R.string.delete_item_question))  // Message asking for confirmation
+        builder.setNegativeButton(getString(R.string.yes)) { dialog, which ->
             eventsViewModel.removeItem(myApp.user, event) {success ->
-                if (!success) Toast.makeText(requireContext(), "Failed to delete event :(", Toast.LENGTH_SHORT).show()
+                if (!success) Toast.makeText(requireContext(), getString(R.string.failed_to_delete_event), Toast.LENGTH_SHORT).show()
             }
         }
-        builder.setPositiveButton("No") { dialog, which ->
+        builder.setPositiveButton(getString(R.string.no)) { dialog, which ->
             dialog.dismiss()
         }
         builder.create().show()

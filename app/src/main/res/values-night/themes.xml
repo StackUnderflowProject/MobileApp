@@ -1,16 +1,21 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.Spotter" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-    </style>
+<!-- Base application theme. -->
+<style name="Theme.Spotter" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <!-- Primary color scheme -->
+    <item name="colorPrimary">@color/white</item> <!-- active navbar icons -->
+    <item name="colorPrimaryVariant">@color/grey_4</item>  <!-- color for background -->
+    <item name="colorOnPrimary">@color/grey_1</item> <!-- Text on primary background -->
+
+    <!-- Secondary color scheme -->
+    <item name="colorSecondary">@color/black</item>
+    <item name="colorSecondaryVariant">@color/light_purple</item>  <!-- button bg color -->
+    <item name="colorOnSecondary">@color/black</item> <!-- Text on secondary background -->
+
+    <!-- Background color -->
+    <item name="android:windowBackground">@color/navbar_color</item>
+
+    <!-- Text colors -->
+    <item name="android:textColorPrimary">@color/grey_1</item> <!-- Primary text color -->
+    <item name="android:textColorSecondary">@color/grey_2</item> <!-- Secondary text color -->
+</style>
 </resources>
