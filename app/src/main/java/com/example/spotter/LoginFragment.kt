@@ -111,6 +111,7 @@ class LoginFragment : Fragment() {
                         user!!.loginTime = System.currentTimeMillis()
                         myApp.user = user
                         myApp.storeUser(requireContext(), user!!)
+                        myApp.initializeWebSocket()
                         callback(0)
                     } else {
                         Log.i("Output", "login(), Error: ${response.code()}")
