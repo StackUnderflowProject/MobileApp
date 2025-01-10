@@ -51,7 +51,7 @@ class GET_ALL_EVENTS_MODEL(
             activity,
             convertToLocalDate(date),
             time,
-            LOCATION("point", listOf(location.coordinates[1], location.coordinates[0])),
+            LOCATION("point", listOf(location.coordinates[0], location.coordinates[1])),
             _id,
             host._id,
             followers,

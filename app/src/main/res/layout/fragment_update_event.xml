@@ -4,26 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3A3A3A">
+    android:background="@color/grey_4">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
-        android:elevation="8dp">
+        android:elevation="8dp"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:textSize="20sp"
-            android:textColor="@color/black"
+            android:backgroundTint="@color/light_purple"
             android:elevation="10dp"
-            android:text="Select location"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="@string/select_location_label"
+            android:textColor="@color/black"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
@@ -31,11 +32,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:text="Select"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:backgroundTint="@color/light_purple"
+            android:text="@string/select"
             app:layout_constraintBottom_toBottomOf="parent"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"
@@ -76,6 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:text="@string/name_label"
+        android:textColor="@color/grey_1"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/title" />
@@ -86,6 +88,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/description_label"
+        android:textColor="@color/grey_1"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/errorActivity" />
@@ -96,6 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/date_label"
+        android:textColor="@color/grey_1"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/errorDescription" />
@@ -106,6 +110,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/time_label"
+        android:textColor="@color/grey_1"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/errorDate" />
@@ -116,6 +121,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/name_hint"
         android:inputType="text"
+        android:textColor="@color/grey_1"
+        android:textColorHint="@color/grey_1"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
@@ -126,6 +133,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/description_hint"
         android:inputType="textMultiLine"
+        android:textColor="@color/grey_1"
+        android:textColorHint="@color/grey_1"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -137,6 +146,8 @@
         android:clickable="true"
         android:focusable="false"
         android:hint="@string/date_hint"
+        android:textColor="@color/grey_1"
+        android:textColorHint="@color/grey_1"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
@@ -148,6 +159,8 @@
         android:clickable="true"
         android:focusable="false"
         android:hint="@string/time_hint"
+        android:textColor="@color/grey_1"
+        android:textColorHint="@color/grey_1"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
@@ -157,6 +170,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="40dp"
+        android:backgroundTint="@color/light_purple"
         android:text="@string/update_event"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
@@ -193,6 +207,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/activity_label"
+        android:textColor="@color/grey_1"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/errorName" />
@@ -203,6 +218,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/activity_hint"
         android:inputType="text"
+        android:textColor="@color/grey_1"
+        android:textColorHint="@color/grey_1"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/labelActivity" />
@@ -262,8 +279,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Edit event"
-        android:textColor="#E863FF"
+        android:text="@string/edit_event_title"
+        android:textColor="@color/light_purple"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -289,7 +306,8 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="CHANGE LOCATION"
+        android:backgroundTint="@color/light_purple"
+        android:text="@string/change_location"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/errorTime" />
