@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="@color/purple_500">
+    android:backgroundTint="@color/light_purple">
 
     <Button
         android:id="@+id/btnTakePhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:backgroundTint="@color/light_purple"
         android:paddingVertical="10dp"
-        android:text="TAKE PHOTO"
+        android:text="@string/take_photo"
         android:textSize="16sp"
         app:cornerRadius="10dp"
         app:layout_constraintEnd_toStartOf="@+id/btnApprove"
@@ -27,8 +28,8 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Take a picture and AI will estimate the popularity of the event!"
-        android:textColor="#FF0000"
+        android:text="@string/ai_description"
+        android:textColor="#D3D3D3"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:paddingVertical="10dp"
-        android:text="SEEM OK"
+        android:text="@string/seem_ok"
         android:textSize="16sp"
         android:visibility="gone"
         app:cornerRadius="10dp"

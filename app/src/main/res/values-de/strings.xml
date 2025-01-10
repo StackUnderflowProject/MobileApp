@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spotter</string>
+    <string name="title_home">Startseite</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Benachrichtigungen</string>
+
+    <!-- fragment_login.xml -->
+    <string name="title_login">Anmeldung</string>
+    <string name="label_username">Benutzername:</string>
+    <string name="label_password">Passwort:</string>
+    <string name="hint_username">Geben Sie den Benutzernamen ein…</string>
+    <string name="login">Anmelden</string>
+    <string name="text_to_signup">Noch keinen Account?</string>
+    <string name="signup">Registrieren</string>
+
+    <string name="title_registration">Registrierung</string>
+    <string name="label_email">E-Mail:</string>
+    <string name="hint_email">Geben Sie Ihre E-Mail ein…</string>
+    <string name="label_repeat_password">Passwort wiederholen:</string>
+    <string name="text_to_login">Bereits einen Account?</string>
+
+    <string name="error_email_empty">E-Mail darf nicht leer sein</string>
+    <string name="error_username_empty">Benutzername darf nicht leer sein</string>
+    <string name="error_password_empty">Passwort darf nicht leer sein</string>
+    <string name="error_passwords_not_matching">Passwörter müssen übereinstimmen!</string>
+    <string name="error_unable_to_connect_to_server">Keine Verbindung zum Server :(</string>
+    <string name="error_failed_login">Falscher Benutzername oder Passwort!</string>
+
+    <!-- fragment_add_event.xml -->
+    <string name="title_add_event">Ereignis erstellen</string>
+    <string name="name_label">Name:</string>
+    <string name="description_label">Beschreibung:</string>
+    <string name="date_label">Datum:</string>
+    <string name="time_label">Zeit:</string>
+    <string name="location_label">Ort:</string>
+    <string name="activity_label">Aktivität:</string>
+
+    <string name="name_hint">Ereignisname</string>
+    <string name="description_hint">Ereignisbeschreibung</string>
+    <string name="date_hint">Ereignisdatum</string>
+    <string name="time_hint">Ereigniszeit</string>
+    <string name="location_hint">Ereignisort</string>
+    <string name="activity_hint">Ereignisaktivität</string>
+
+    <string name="create_event">Ereignis erstellen</string>
+    <string name="update_event">Ereignis aktualisieren</string>
+    <string name="error_failed_create_event">Ereignis konnte nicht erstellt werden!</string>
+    <string name="error_empty_field">Dieses Feld darf nicht leer sein</string>
+    <string name="select_location_label">Ort auswählen</string>
+    <string name="select">Auswählen</string>
+    <string name="edit_event_title">Ereignis bearbeiten</string>
+    <string name="change_location">ORT ÄNDERN</string>
+    <string name="failed_to_delete_event">Ereignis konnte nicht gelöscht werden :(</string>
+
+    <string name="delete_item">Element löschen</string>
+    <string name="delete_item_question">Möchten Sie dieses Element wirklich löschen?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nein</string>
+
+    <!-- fragment_list_events.xml -->
+    <string name="btn_add">POSTEN +</string>
+
+    <!-- fagment_home.xml -->
+    <string name="btn_take_photo">FOTO</string>
+    <string name="predicted_count">Voraussichtliche Anzahl: %d</string>
+    <string name="estimated_count">Geschätzte Personenanzahl auf dem Bild ist %d</string>
+    <string name="retake">WIEDERHOLEN</string>
+    <string name="error_ai">Anfrage fehlgeschlagen :(</string>
+    <string name="uploading">HOCHLADEN…</string>
+    <string name="success">ERFOLG</string>
+    <string name="failed">FEHLGESCHLAGEN</string>
+    <string name="camera_permission_required">Kameraberechtigung ist erforderlich</string>
+    <string name="username_not_loaded">Benutzername nicht geladen</string>
+    <string name="email_not_loaded">E-Mail nicht geladen</string>
+    <string name="none">Keine</string>
+    <string name="category">Kategorie:</string>
+    <string name="distance">Entfernung:</string>
+    <string name="time">Zeit:</string>
+
+
+    <!-- fragment_event.xml -->
+    <string name="subscribe">ABONNIEREN</string>
+
+    <!-- fragment_img_ai.xml -->
+    <string name="take_photo">FOTO MACHEN</string>
+    <string name="ai_description">Machen Sie ein Foto und KI wird die Beliebtheit des Ereignisses schätzen!</string>
+    <string name="seem_ok">SCHEINT OK</string>
+
+    <!-- fragment_user_profile.xml -->
+    <string name="preferences">Einstellungen</string>
+    <string name="select_theme">Thema auswählen</string>
+    <string name="select_language">Sprache auswählen</string>
+    <string name="logout">ABMELDEN</string>
+</resources>

@@ -143,7 +143,7 @@ class HomeFragment : Fragment() {
                 requireActivity().runOnUiThread {
                     map.controller.setZoom(15.0)
                     map.controller.setCenter(geoPoint)
-                    showMyLocation(geoPoint)
+                    if (::map.isInitialized) showMyLocation(geoPoint)
                 }
             }
         }
@@ -218,8 +218,8 @@ class HomeFragment : Fragment() {
         binding.sheetContainer.removeAllViews()
         binding.sheetContainer.addView(eventBinding!!.root)
 
-        eventBinding!!.username.text = activeEvent!!.hostObj?.username ?: "Username not loaded"
-        eventBinding!!.userEmail.text = activeEvent!!.hostObj?.email ?: "Email not loaded"
+        eventBinding!!.username.text = activeEvent!!.hostObj?.username ?: getString(R.string.username_not_loaded)
+        eventBinding!!.userEmail.text = activeEvent!!.hostObj?.email ?: getString(R.string.email_not_loaded)
         eventBinding!!.eventDate.text = activeEvent!!.date.toString()
         eventBinding!!.eventTime.text = activeEvent!!.time
         eventBinding!!.title.text = activeEvent!!.name
@@ -257,14 +257,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun showMyLocation(p : GeoPoint) {
-        val marker = Marker(map)
-        marker.position = p
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        if (!::map.isInitialized) return
+        map.post {
+            val marker = Marker(map)
+            marker.position = p
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
 
-        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.mylocation_marker)
-        marker.icon = drawable
+            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.mylocation_marker)
+            marker.icon = drawable
 
-        map.overlays.add(marker)
+            map.overlays.add(marker)
+        }
     }
 
     override fun onPause() {
@@ -288,7 +291,7 @@ class HomeFragment : Fragment() {
         binding.seekbarDistance.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (programaticSeekbarChange) {programaticSeekbarChange = false; return;}
-                binding.labelDistance.text = if (progress != 0) "${((progress / 100.0) * MAX_DISTANCE).toInt()}km" else "None"
+                binding.labelDistance.text = if (progress != 0) "${((progress / 100.0) * MAX_DISTANCE).toInt()}km" else getString(R.string.none)
                 binding.containerFilters.background.alpha = 100
                 val location = if (myLocationOverlay.lastFix != null) GeoPoint(myLocationOverlay.lastFix.latitude, myLocationOverlay.lastFix.longitude) else GeoPoint(46.1512, 14.9955)
                 map.controller.setCenter(location)
@@ -362,7 +365,7 @@ class HomeFragment : Fragment() {
                 binding.spinnerTime.setSelection(0)
                 programaticSeekbarChange = true
                 binding.seekbarDistance.progress = 0
-                binding.labelDistance.text = "None"
+                binding.labelDistance.text = getString(R.string.none)
                 binding.btnRestoreDefaults.setBackgroundColor(Color.GRAY)
                 refreshMap()
             }
@@ -458,7 +461,7 @@ class HomeFragment : Fragment() {
                 val textHeight = textBounds.height()
 
                 // Load image as Bitmap
-                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.camera)
+                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.camera_white)
                 val iconBitmap = (drawable as BitmapDrawable).bitmap
 
                 // Icon dimensions
@@ -540,7 +543,7 @@ class HomeFragment : Fragment() {
 
                     // Text and Paints for the predicted count label
                     val predictedCountText =
-                        "Predicted count: ${e.predicted_count}"  // Dynamic count value
+                        getString(R.string.predicted_count, e.predicted_count)  // Dynamic count value
                     val textPaint = Paint().apply {
                         color = Color.BLACK
                         textSize = 40f
@@ -579,22 +582,21 @@ class HomeFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == IMAGE_CAPTURE_CODE && resultCode == Activity.RESULT_OK) {
             aiBinding!!.dimmer.visibility = View.VISIBLE
-            Toast.makeText(requireContext(), "Photo saved at: ${imageUri.toString()}", Toast.LENGTH_SHORT).show()
             Log.i("SIZE", "${getFileFromUri(requireContext(), imageUri!!)!!.length()}")
             getPredictedCount(myApp.user, activeEvent!!, createImagePart(compressImage(getFileFromUri(requireContext(), imageUri!!)))!!) { predictedCount ->
                 if (predictedCount != -1) {
                     uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, predictedCount) { e ->
                         if (e != null) {
                             aiBinding!!.photoFrame.visibility = View.VISIBLE
-                            aiBinding!!.description.text = "Estimated count: $predictedCount"
-                            aiBinding!!.btnTakePhoto.text = "RETAKE"
+                            aiBinding!!.description.text = getString(R.string.estimated_count, predictedCount)
+                            aiBinding!!.btnTakePhoto.text = getString(R.string.retake)
                             aiBinding!!.btnApprove.visibility = View.VISIBLE
                             aiBinding!!.photoFrame.setImageURI(imageUri)
                             aiBinding!!.dimmer.visibility = View.GONE
                         }
                     }
                 } else {
-                    aiBinding!!.errorAI.text = "Request failed :("
+                    aiBinding!!.errorAI.text = getString(R.string.error_ai)
                     aiBinding!!.errorAI.visibility = View.VISIBLE
                     aiBinding!!.dimmer.visibility = View.GONE
                 }
@@ -606,12 +608,12 @@ class HomeFragment : Fragment() {
             requestCameraPermission()
         }
         aiBinding!!.btnApprove.setOnClickListener {
-            aiBinding!!.btnApprove.text = "UPLOADING..."
+            aiBinding!!.btnApprove.text = getString(R.string.uploading)
             uploadImgResults(myApp.user, activeEvent as Event, createImagePart(getFileFromUri(requireContext(), imageUri!!))!!, activeEvent!!.predicted_count!!) { e ->
                 if (e != null) {
-                    aiBinding!!.btnApprove.text = "SUCCESS"
+                    aiBinding!!.btnApprove.text = getString(R.string.success)
                 } else {
-                    aiBinding!!.btnApprove.text = "FAILED"
+                    aiBinding!!.btnApprove.text = getString(R.string.failed)
                 }
             }
         }
@@ -695,7 +697,7 @@ class HomeFragment : Fragment() {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
             } else {
-                Toast.makeText(requireContext(), "Camera permission is required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.camera_permission_required), Toast.LENGTH_SHORT).show()
             }
         }
     }

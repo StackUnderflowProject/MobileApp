@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:text="Category:"
+                android:text="@string/category"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView11" />
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
-                android:text="Distance:"
+                android:text="@string/distance"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
-                android:text="Time:"
+                android:text="@string/time"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="@id/barrier3"
                 app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -183,19 +183,18 @@
 
             <ImageButton
                 android:id="@+id/btnClose"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@color/grey_5"
                 app:layout_constraintBottom_toTopOf="@id/scrollView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
-                tools:layout_editor_absoluteX="355dp"
-                tools:layout_editor_absoluteY="115dp" />
+                app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 
             <ScrollView
                 android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/white"
+                android:background="@color/grey_4"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHeight_percent="0.5">
 

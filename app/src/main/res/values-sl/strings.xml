@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spotter</string>
+    <string name="title_home">Domov</string>
+    <string name="title_dashboard">Nadzorna plošča</string>
+    <string name="title_notifications">Obvestila</string>
+
+    <!-- fragment_login.xml -->
+    <string name="title_login">Prijava</string>
+    <string name="label_username">Uporabniško ime:</string>
+    <string name="label_password">Geslo:</string>
+    <string name="hint_username">Vnesite uporabniško ime…</string>
+    <string name="login">Prijava</string>
+    <string name="text_to_signup">Nimate računa?</string>
+    <string name="signup">Registracija</string>
+
+    <string name="title_registration">Registracija</string>
+    <string name="label_email">E-pošta:</string>
+    <string name="hint_email">Vnesite e-pošto…</string>
+    <string name="label_repeat_password">Ponovite geslo:</string>
+    <string name="text_to_login">Že imate račun?</string>
+
+    <string name="error_email_empty">E-pošta ne sme biti prazna</string>
+    <string name="error_username_empty">Uporabniško ime ne sme biti prazno</string>
+    <string name="error_password_empty">Geslo ne sme biti prazno</string>
+    <string name="error_passwords_not_matching">Gesli se morata ujemati!</string>
+    <string name="error_unable_to_connect_to_server">Povezava s strežnikom ni uspela :(</string>
+    <string name="error_failed_login">Napačno uporabniško ime ali geslo!</string>
+
+    <!-- fragment_add_event.xml -->
+    <string name="title_add_event">Ustvari dogodek</string>
+    <string name="name_label">Ime:</string>
+    <string name="description_label">Opis:</string>
+    <string name="date_label">Datum:</string>
+    <string name="time_label">Čas:</string>
+    <string name="location_label">Lokacija:</string>
+    <string name="activity_label">Dejavnost:</string>
+
+    <string name="name_hint">Ime dogodka</string>
+    <string name="description_hint">Opis dogodka</string>
+    <string name="date_hint">Datum dogodka</string>
+    <string name="time_hint">Čas dogodka</string>
+    <string name="location_hint">Lokacija dogodka</string>
+    <string name="activity_hint">Dejavnost dogodka</string>
+
+    <string name="create_event">Ustvari dogodek</string>
+    <string name="update_event">Posodobi dogodek</string>
+    <string name="error_failed_create_event">Ustvarjanje dogodka ni uspelo!</string>
+    <string name="error_empty_field">Polje ne sme biti prazno</string>
+    <string name="select_location_label">Izberite lokacijo</string>
+    <string name="select">Izberi</string>
+    <string name="edit_event_title">Uredi dogodek</string>
+    <string name="change_location">SPREMENI LOKACIJO</string>
+    <string name="failed_to_delete_event">Brisanje dogodka ni uspelo :(</string>
+
+    <string name="delete_item">Izbriši element</string>
+    <string name="delete_item_question">Ste prepričani, da želite izbrisati ta element?</string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
+
+    <!-- fragment_list_events.xml -->
+    <string name="btn_add">OBJAVI +</string>
+
+    <!-- fagment_home.xml -->
+    <string name="btn_take_photo">FOTOGRAFIJA</string>
+    <string name="predicted_count">Gledalci: %d</string>
+    <string name="estimated_count">Ocenjeno število ljudi na sliki je %d</string>
+    <string name="retake">PONOVI</string>
+    <string name="error_ai">Zahteva ni uspela :(</string>
+    <string name="uploading">NALAGANJE…</string>
+    <string name="success">USPEŠNO</string>
+    <string name="failed">NI USPESLO</string>
+    <string name="camera_permission_required">Dovoljenje za kamero je potrebno</string>
+    <string name="username_not_loaded">Uporabniško ime ni naloženo</string>
+    <string name="email_not_loaded">E-pošta ni naložena</string>
+    <string name="none">Nič</string>
+    <string name="category">Kategorija:</string>
+    <string name="distance">Razdalja:</string>
+    <string name="time">Čas:</string>
+
+
+    <!-- fragment_event.xml -->
+    <string name="subscribe">NAROČI SE</string>
+
+    <!-- fragment_img_ai.xml -->
+    <string name="take_photo">FOTOGRAFIRAJ</string>
+    <string name="ai_description">Posnemite fotografijo in umetna inteligenca bo ocenila priljubljenost dogodka!</string>
+    <string name="seem_ok">ZDI SE V REDU</string>
+
+    <!-- fragment_user_profile.xml -->
+    <string name="preferences">Nastavitve</string>
+    <string name="select_theme">Izberi temo</string>
+    <string name="select_language">Izberi jezik</string>
+    <string name="logout">ODJAVA</string>
+</resources>
