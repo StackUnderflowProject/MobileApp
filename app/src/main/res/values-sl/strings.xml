@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Spotter</string>
     <string name="title_home">Domov</string>
-    <string name="title_dashboard">Nadzorna plošča</string>
-    <string name="title_notifications">Obvestila</string>
+    <string name="title_discover">Razišči</string>
+    <string name="title_user_profile">Profil</string>
 
     <!-- fragment_login.xml -->
     <string name="title_login">Prijava</string>
