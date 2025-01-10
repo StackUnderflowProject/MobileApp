@@ -47,7 +47,7 @@ material-v170 = { module = "com.google.android.material:material", version.ref =
 org-mongodb-bson = { module = "org.mongodb:bson", version.ref = "mongodbBson" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-socket-socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketSocketIoClient" }
+socket-socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIoClientVersion" }
 squareup-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "squareupLoggingInterceptor" }
 squareup-picasso = { module = "com.squareup.picasso:picasso", version.ref = "squareupPicasso" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }

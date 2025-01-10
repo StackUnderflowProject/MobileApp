@@ -205,8 +205,8 @@ class HomeFragment : Fragment() {
                 }
                 map.overlays.add(marker)
 
-                addPredictButton(e)
-                addPredictLabel(e)
+                if (e.isHappeningToday()) addPredictButton(e)
+                if (e.predicted_count != null && e.predicted_count > 0) addPredictLabel(e)
             }
         }
         map.invalidate()
