@@ -62,6 +62,8 @@
 
     <!-- fragment_list_events.xml -->
     <string name="btn_add">POSTEN +</string>
+    <string name="no_events_to_display">Keine Ereignisse zum Anzeigen</string>
+
 
     <!-- fagment_home.xml -->
     <string name="btn_take_photo">FOTO</string>

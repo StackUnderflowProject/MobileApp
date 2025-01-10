@@ -33,7 +33,7 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         holder.binding.eventTime.text = event.time
         holder.binding.title.text = event.name
         holder.binding.description.text = event.description
-        holder.binding.location.text = getAddressFromCoordinates(event.location.coordinates[0], event.location.coordinates[1]) ?: "Unknown location"
+        holder.binding.location.text = getAddressFromCoordinates(event.location.coordinates[1], event.location.coordinates[0]) ?: "Unknown location"
         holder.binding.activity.text = event.activity
         holder.binding.activityIcon.setImageDrawable(
             when (event.activity.lowercase()) {

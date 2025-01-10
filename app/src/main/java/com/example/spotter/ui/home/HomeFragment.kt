@@ -188,7 +188,7 @@ class HomeFragment : Fragment() {
             run {
                 if (!filter.isEventOk(startPos, e)) return@run
                 val marker = Marker(map)
-                marker.position = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                marker.position = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
 
                 val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.marker_activity)
@@ -438,7 +438,7 @@ class HomeFragment : Fragment() {
                 if (canvas == null || mapView == null) return
 
                 // Convert GeoPoint to screen coordinates
-                val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 val point = Point()
                 mapView.projection.toPixels(markerPosition, point)
 
@@ -504,7 +504,7 @@ class HomeFragment : Fragment() {
                 val tapPoint = Point(motionEvent.x.toInt(), motionEvent.y.toInt())
 
                 // Get the button's on-screen coordinates
-                val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 val markerScreenPoint = Point()
                 mapView.projection.toPixels(markerPosition, markerScreenPoint)
 
@@ -537,7 +537,7 @@ class HomeFragment : Fragment() {
                     if (canvas == null || mapView == null) return
 
                     // Example marker position (replace this with the actual GeoPoint of your marker)
-                    val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                    val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                     val point = Point()
                     mapView.projection.toPixels(markerPosition, point)
 
