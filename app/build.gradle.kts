@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.socket.socket.io.client)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.security.crypto)
     implementation(libs.org.mongodb.bson)
@@ -46,7 +47,7 @@ dependencies {
     implementation(libs.squareup.picasso)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    implementation(libs.osmdroid.android)
+    implementation(libs.osmdroid.android.v6114)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -58,6 +59,5 @@ dependencies {
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    implementation(libs.socket.socket.io.client)
     androidTestImplementation(libs.androidx.espresso.core)
 }

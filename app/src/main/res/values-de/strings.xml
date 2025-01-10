@@ -26,6 +26,8 @@
     <string name="error_passwords_not_matching">Passwörter müssen übereinstimmen!</string>
     <string name="error_unable_to_connect_to_server">Keine Verbindung zum Server :(</string>
     <string name="error_failed_login">Falscher Benutzername oder Passwort!</string>
+    <string name="user_w_username_exists">Ein Benutzer mit diesem Benutzernamen existiert bereits!</string>
+
 
     <!-- fragment_add_event.xml -->
     <string name="title_add_event">Ereignis erstellen</string>
@@ -60,6 +62,8 @@
 
     <!-- fragment_list_events.xml -->
     <string name="btn_add">POSTEN +</string>
+    <string name="no_events_to_display">Keine Ereignisse zum Anzeigen</string>
+
 
     <!-- fagment_home.xml -->
     <string name="btn_take_photo">FOTO</string>

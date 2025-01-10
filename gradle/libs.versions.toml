@@ -17,6 +17,7 @@ mongodbBson = "4.11.0"
 navigationFragmentKtx = "2.8.4"
 navigationUiKtx = "2.8.4"
 osmdroidAndroid = "6.1.11"
+osmdroidAndroidVersion = "6.1.14"
 retrofit = "2.9.0"
 socketIoClientVersion = "2.0.1"
 squareupLoggingInterceptor = "4.11.0"
@@ -46,8 +47,9 @@ material-v120alpha02 = { module = "com.google.android.material:material", versio
 material-v170 = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 org-mongodb-bson = { module = "org.mongodb:bson", version.ref = "mongodbBson" }
 osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
+osmdroid-android-v6114 = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroidVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-socket-socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketSocketIoClient" }
+socket-socket-io-client = { module = "io.socket:socket.io-client", version.ref = "socketIoClientVersion" }
 squareup-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "squareupLoggingInterceptor" }
 squareup-picasso = { module = "com.squareup.picasso:picasso", version.ref = "squareupPicasso" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }

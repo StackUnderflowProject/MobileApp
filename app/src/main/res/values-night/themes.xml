@@ -7,7 +7,7 @@
     <item name="colorOnPrimary">@color/grey_1</item> <!-- Text on primary background -->
 
     <!-- Secondary color scheme -->
-    <item name="colorSecondary">@color/black</item>
+    <item name="colorSecondary">@color/white</item> <!-- google widgets selected date -->
     <item name="colorSecondaryVariant">@color/light_purple</item>  <!-- button bg color -->
     <item name="colorOnSecondary">@color/black</item> <!-- Text on secondary background -->
 

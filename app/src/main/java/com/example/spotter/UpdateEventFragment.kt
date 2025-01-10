@@ -1,5 +1,6 @@
 package com.example.spotter
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Bitmap
@@ -41,6 +42,7 @@ class UpdateEventFragment : Fragment() {
     private lateinit var gson : Gson
     private var globalEvent : Event? = null
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
         binding = FragmentUpdateEventBinding.inflate(inflater, container, false)
@@ -67,7 +69,7 @@ class UpdateEventFragment : Fragment() {
                 binding.inputName.setText(event.name)
                 binding.inputDescription.setText(event.description)
                 binding.inputActivity.setText(event.activity)
-                binding.inputDate.setText(event.date.toString())
+                binding.inputDate.setText("${event.date.dayOfMonth}/${event.date.monthValue}/${event.date.year}")
                 binding.inputTime.setText(event.time)
 
                 binding.inputDate.setOnClickListener {
@@ -214,6 +216,7 @@ class UpdateEventFragment : Fragment() {
         ))
         marker.icon = scaledDrawable
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.infoWindow = null
         mapView.overlays.add(marker)
     }
 

@@ -95,6 +95,8 @@ class DashboardFragment : Fragment(), EventClickListener {
                     3 -> eventsAdapter.notifyItemChanged(eventsViewModel.index)
                 }
             }
+            if (events.isEmpty()) binding.labelEmptyList.visibility = View.VISIBLE
+            else binding.labelEmptyList.visibility = View.GONE
         })
 
         binding.btnAdd.setOnClickListener {

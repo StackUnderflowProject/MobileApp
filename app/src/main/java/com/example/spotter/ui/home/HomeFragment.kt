@@ -15,6 +15,7 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -188,11 +189,19 @@ class HomeFragment : Fragment() {
             run {
                 if (!filter.isEventOk(startPos, e)) return@run
                 val marker = Marker(map)
-                marker.position = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                marker.position = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                marker.infoWindow = null
 
-                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.marker_activity)
-                marker.icon = drawable
+                val drawable = ContextCompat.getDrawable(requireContext(),
+                    when (e.activity.lowercase()) {
+                        "nogomet", "futsal", "football" -> R.drawable.marker_football
+                        "rokomet", "handball" -> R.drawable.marker_handball
+                        else -> R.drawable.marker_activity
+                    }
+                )
+                val scaledIcon = BitmapDrawable(resources, Bitmap.createScaledBitmap((drawable as BitmapDrawable).bitmap, 42, 62, false))
+                marker.icon = scaledIcon
 
                 marker.title = e.name
                 marker.setOnMarkerClickListener { a, b ->
@@ -205,13 +214,14 @@ class HomeFragment : Fragment() {
                 }
                 map.overlays.add(marker)
 
-                addPredictButton(e)
-                addPredictLabel(e)
+                if (e.isHappeningToday()) addPredictButton(e)
+                if (e.predicted_count != null && e.predicted_count > 0) addPredictLabel(e)
             }
         }
         map.invalidate()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showEvent() {
         val inflater = LayoutInflater.from(requireContext())
         eventBinding = FragmentEventBinding.inflate(inflater, binding.sheetContainer, false)
@@ -220,11 +230,11 @@ class HomeFragment : Fragment() {
 
         eventBinding!!.username.text = activeEvent!!.hostObj?.username ?: getString(R.string.username_not_loaded)
         eventBinding!!.userEmail.text = activeEvent!!.hostObj?.email ?: getString(R.string.email_not_loaded)
-        eventBinding!!.eventDate.text = activeEvent!!.date.toString()
-        eventBinding!!.eventTime.text = activeEvent!!.time
+        eventBinding!!.eventDate.text = "${activeEvent!!.date.dayOfMonth}-${activeEvent!!.date.monthValue}-${activeEvent!!.date.year}"
+        eventBinding!!.eventTime.text = formatTime(activeEvent!!.time)
         eventBinding!!.title.text = activeEvent!!.name
         eventBinding!!.description.text = activeEvent!!.description
-        eventBinding!!.location.text = activeEvent!!.location.toString()
+        eventBinding!!.location.text = getAddressFromCoordinates(activeEvent!!.location.coordinates[1], activeEvent!!.location.coordinates[0]) ?: "Unknown location"
         eventBinding!!.activity.text = activeEvent!!.activity
         eventBinding!!.activityIcon.setImageDrawable(
             when (activeEvent!!.activity.lowercase()) {
@@ -262,9 +272,12 @@ class HomeFragment : Fragment() {
             val marker = Marker(map)
             marker.position = p
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            marker.infoWindow = null
 
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.mylocation_marker)
-            marker.icon = drawable
+            val scaledIcon = BitmapDrawable(resources, Bitmap.createScaledBitmap((drawable as BitmapDrawable).bitmap, 32, 40, false))
+
+            marker.icon = scaledIcon
 
             map.overlays.add(marker)
         }
@@ -438,7 +451,7 @@ class HomeFragment : Fragment() {
                 if (canvas == null || mapView == null) return
 
                 // Convert GeoPoint to screen coordinates
-                val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 val point = Point()
                 mapView.projection.toPixels(markerPosition, point)
 
@@ -504,7 +517,7 @@ class HomeFragment : Fragment() {
                 val tapPoint = Point(motionEvent.x.toInt(), motionEvent.y.toInt())
 
                 // Get the button's on-screen coordinates
-                val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                 val markerScreenPoint = Point()
                 mapView.projection.toPixels(markerPosition, markerScreenPoint)
 
@@ -537,7 +550,7 @@ class HomeFragment : Fragment() {
                     if (canvas == null || mapView == null) return
 
                     // Example marker position (replace this with the actual GeoPoint of your marker)
-                    val markerPosition = GeoPoint(e.location.coordinates[0], e.location.coordinates[1])
+                    val markerPosition = GeoPoint(e.location.coordinates[1], e.location.coordinates[0])
                     val point = Point()
                     mapView.projection.toPixels(markerPosition, point)
 
@@ -699,6 +712,28 @@ class HomeFragment : Fragment() {
             } else {
                 Toast.makeText(requireContext(), getString(R.string.camera_permission_required), Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun formatTime(timeString: String): String {
+        val timeParts = timeString.split(":")
+        val hours = timeParts[0]
+        val minutes = timeParts[1]
+        return "$hours:${if (minutes.length == 2) minutes else "0$minutes"}"
+    }
+
+    private fun getAddressFromCoordinates(latitude: Double, longitude: Double): String? {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        return try {
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            if (!addresses.isNullOrEmpty()) {
+                addresses[0].getAddressLine(0) // Full address
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }

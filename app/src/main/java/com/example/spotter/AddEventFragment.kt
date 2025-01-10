@@ -120,7 +120,7 @@ class AddEventFragment : Fragment() {
                     binding.inputActivity.text.toString(),
                     convertToLocalDate(binding.inputDate.text.toString()),
                     binding.inputTime.text.toString(),
-                    LOCATION("point", listOf(locationSelected!!.latitude, locationSelected!!.longitude)),
+                    LOCATION("point", listOf(locationSelected!!.longitude, locationSelected!!.latitude)),
                     host = myApp.user?._id ?: ObjectId()
                 )
                 eventsViewModel.addItem(event, myApp.user) { success ->
@@ -217,6 +217,7 @@ class AddEventFragment : Fragment() {
         ))
         marker.icon = scaledDrawable
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.infoWindow = null
         mapView.overlays.add(marker)
     }
 

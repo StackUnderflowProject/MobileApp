@@ -38,9 +38,9 @@ class WebSocketManager {
     }
 
     fun emitCreateEvent(token: String) {
-        val data = JSONObject()
-        data.put("token", token)
-        socket.emit("create-event", data)
+        //val data = JSONObject()
+        //data.put("token", token)
+        socket.emit("create-event", token)
     }
 
     fun emitDeleteEvent() {

@@ -76,8 +76,8 @@ class Filter(
 
              val lat1 = Math.toRadians(startPoint.latitude)
              val lon1 = Math.toRadians(startPoint.longitude)
-             val lat2 = Math.toRadians(event.location.coordinates[0])
-             val lon2 = Math.toRadians(event.location.coordinates[1])
+             val lat2 = Math.toRadians(event.location.coordinates[1])
+             val lon2 = Math.toRadians(event.location.coordinates[0])
 
              val dLat = lat2 - lat1
              val dLon = lon2 - lon1

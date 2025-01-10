@@ -7,7 +7,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZonedDateTime
+import kotlin.math.abs
 
 data class Event(
     var name : String,
@@ -35,6 +37,15 @@ data class Event(
                 "time='$time', location='$location', _id='$_id', host='$host', followers=$followers, " +
                 "hostObj=$hostObj, score=$score, predicted_count=$predicted_count, __v=$__v, image='$image', " +
                 "notifyOn=$notifyOn)"
+    }
+
+    fun isHappeningToday() : Boolean {
+        val timeString = time
+        val timeParts = timeString.split(":")
+        val hours = timeParts[0].toInt()
+        val minutes = timeParts[1].toInt()
+        val timeDiff = date.atTime(LocalTime.of(hours, minutes)).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis()
+        return timeDiff < 0 && timeDiff > (-3600000) || timeDiff > 0 && timeDiff < (5 * 3600000)
     }
 }
 
