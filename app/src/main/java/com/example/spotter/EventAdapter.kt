@@ -1,5 +1,6 @@
 package com.example.spotter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
@@ -24,13 +25,14 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
         return EventViewHolder(binding)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: EventViewHolder, position: Int) {
         val event: Event = events[position]
         Log.i("Output2", event.toString())
         holder.binding.username.text = event.hostObj?.username ?: "Username not loaded"
         holder.binding.userEmail.text = event.hostObj?.email ?: "Email not loaded"
-        holder.binding.eventDate.text = event.date.toString()
-        holder.binding.eventTime.text = event.time
+        holder.binding.eventDate.text = "${event.date.dayOfMonth}-${event.date.monthValue}-${event.date.year}"
+        holder.binding.eventTime.text = formatTime(event.time)
         holder.binding.title.text = event.name
         holder.binding.description.text = event.description
         holder.binding.location.text = getAddressFromCoordinates(event.location.coordinates[1], event.location.coordinates[0]) ?: "Unknown location"
@@ -116,5 +118,12 @@ class EventsAdapter(val context: Context, private val events: List<Event>, priva
             e.printStackTrace()
             null
         }
+    }
+
+    private fun formatTime(timeString: String): String {
+        val timeParts = timeString.split(":")
+        val hours = timeParts[0]
+        val minutes = timeParts[1]
+        return "$hours:${if (minutes.length == 2) minutes else "0$minutes"}"
     }
 }

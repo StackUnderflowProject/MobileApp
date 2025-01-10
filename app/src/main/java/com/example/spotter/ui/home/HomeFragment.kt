@@ -15,6 +15,7 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.BitmapDrawable
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -212,6 +213,7 @@ class HomeFragment : Fragment() {
         map.invalidate()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showEvent() {
         val inflater = LayoutInflater.from(requireContext())
         eventBinding = FragmentEventBinding.inflate(inflater, binding.sheetContainer, false)
@@ -220,11 +222,11 @@ class HomeFragment : Fragment() {
 
         eventBinding!!.username.text = activeEvent!!.hostObj?.username ?: getString(R.string.username_not_loaded)
         eventBinding!!.userEmail.text = activeEvent!!.hostObj?.email ?: getString(R.string.email_not_loaded)
-        eventBinding!!.eventDate.text = activeEvent!!.date.toString()
-        eventBinding!!.eventTime.text = activeEvent!!.time
+        eventBinding!!.eventDate.text = "${activeEvent!!.date.dayOfMonth}-${activeEvent!!.date.monthValue}-${activeEvent!!.date.year}"
+        eventBinding!!.eventTime.text = formatTime(activeEvent!!.time)
         eventBinding!!.title.text = activeEvent!!.name
         eventBinding!!.description.text = activeEvent!!.description
-        eventBinding!!.location.text = activeEvent!!.location.toString()
+        eventBinding!!.location.text = getAddressFromCoordinates(activeEvent!!.location.coordinates[1], activeEvent!!.location.coordinates[0]) ?: "Unknown location"
         eventBinding!!.activity.text = activeEvent!!.activity
         eventBinding!!.activityIcon.setImageDrawable(
             when (activeEvent!!.activity.lowercase()) {
@@ -699,6 +701,28 @@ class HomeFragment : Fragment() {
             } else {
                 Toast.makeText(requireContext(), getString(R.string.camera_permission_required), Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun formatTime(timeString: String): String {
+        val timeParts = timeString.split(":")
+        val hours = timeParts[0]
+        val minutes = timeParts[1]
+        return "$hours:${if (minutes.length == 2) minutes else "0$minutes"}"
+    }
+
+    private fun getAddressFromCoordinates(latitude: Double, longitude: Double): String? {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        return try {
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+            if (!addresses.isNullOrEmpty()) {
+                addresses[0].getAddressLine(0) // Full address
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 }
