@@ -3,7 +3,6 @@ package com.example.spotter
 import android.util.Log
 import io.socket.client.IO
 import io.socket.client.Socket
-import org.json.JSONObject
 
 class WebSocketManager {
     private lateinit var socket: Socket
@@ -27,6 +26,10 @@ class WebSocketManager {
                 listener.onChange()
             }
 
+            socket.on("update-match") {
+                listener.onChange()
+            }
+
             socket.on("error") {
                 Log.i("Socket","Websocket Error: ${it[0]}")
             }
@@ -45,6 +48,10 @@ class WebSocketManager {
 
     fun emitDeleteEvent() {
         socket.emit("delete-event")
+    }
+
+    fun emitUpdateMatch() {
+        socket.emit("update-match")
     }
 
     fun disconnectWebSocket() {

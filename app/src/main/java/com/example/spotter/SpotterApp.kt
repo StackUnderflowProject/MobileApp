@@ -56,6 +56,11 @@ class SpotterApp : Application(), WebsocketListener  {
         webSocketManager!!.emitDeleteEvent()
     }
 
+    fun sendUpdateMatchOnSocket() {
+        if (user == null || webSocketManager == null) return
+        webSocketManager!!.emitUpdateMatch()
+    }
+
     override fun onChange() {
         eventsViewModel.getAllEvents(this)
     }

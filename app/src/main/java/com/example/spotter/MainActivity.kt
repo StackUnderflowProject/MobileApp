@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications, R.id.navigation_simulator
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             bundle?.let {fragment.arguments = bundle}
             fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
             if (backStack != null && backStack.isEmpty()) fragmentTransaction.addToBackStack(null)
-            if (backStack != null && backStack.isNotEmpty()) fragmentTransaction.addToBackStack(backStack)
+            if (!backStack.isNullOrEmpty()) fragmentTransaction.addToBackStack(backStack)
         }
 
         fragmentTransaction.commit()

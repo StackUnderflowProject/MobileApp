@@ -22,4 +22,10 @@
         android:name="com.example.spotter.ui.notifications.NotificationsFragment"
         android:label="@string/title_user_profile"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_simulator"
+        android:name="com.example.spotter.ui.simulator.SimulatorFragment"
+        android:label="@string/simulator"
+        tools:layout="@layout/fragment_simulator" />
 </navigation>

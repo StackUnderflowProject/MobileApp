@@ -1,6 +1,6 @@
 package com.example.spotter
 
-import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -11,7 +11,6 @@ import org.bson.types.ObjectId
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.lang.reflect.Type
 import java.time.Instant
 import java.time.ZoneId
@@ -49,7 +48,7 @@ object RetrofitInstance {
         }
     }
 
-    val gson = GsonBuilder()
+    private val gson: Gson = GsonBuilder()
         .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
         .registerTypeAdapter(ObjectId::class.java, ObjectIdDeserializer())
         .create()
