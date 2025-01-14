@@ -10,9 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.spotter.Match
 import com.example.spotter.RetrofitInstance
 import com.example.spotter.SpotterApp
-import com.example.spotter.User
 import com.example.spotter.databinding.FragmentSimulatorBinding
-import com.google.gson.Gson
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -24,9 +22,11 @@ import java.time.LocalDate
 
 class SimulatorFragment : Fragment() {
     private lateinit var binding: FragmentSimulatorBinding
-    private lateinit var myApp : SpotterApp
-    private lateinit var matches : List<Match>
-    private var simulationJob: Job? = null
+    private lateinit var myApp: SpotterApp
+    private lateinit var footballMatches: List<Match>
+    private lateinit var handballMatches: List<Match>
+    private var footballSimulationJob: Job? = null
+    private var handballSimulationJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,8 +37,13 @@ class SimulatorFragment : Fragment() {
 
         myApp = requireActivity().application as SpotterApp
 
-        binding.btnStartSimulation.setOnClickListener {
-            startSimulation()
+        // Set up button listeners
+        binding.btnStartFootballSimulation.setOnClickListener {
+            startFootballSimulation()
+        }
+
+        binding.btnStartHandballSimulation.setOnClickListener {
+            startHandballSimulation()
         }
 
         binding.btnStopSimulation.setOnClickListener {
@@ -47,10 +52,19 @@ class SimulatorFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                Log.d("SimulatorFragment", "Fetching matches for ${LocalDate.now()}")
-                matches = RetrofitInstance.api.getFootballMatches(LocalDate.now().toString(), LocalDate.now().plusDays(1).toString())
-                Log.d("SimulatorFragment", "Fetched ${matches.size} matches")
-                // Start the simulation when matches are fetched
+                Log.d("SimulatorFragment", "Fetching football matches for ${LocalDate.now()}")
+                footballMatches = RetrofitInstance.api.getFootballMatches(
+                    LocalDate.now().toString(),
+                    LocalDate.now().plusDays(1).toString()
+                )
+                Log.d("SimulatorFragment", "Fetched ${footballMatches.size} football matches")
+
+                Log.d("SimulatorFragment", "Fetching handball matches for ${LocalDate.now()}")
+                handballMatches = RetrofitInstance.api.getHandballMatches(
+                    LocalDate.now().toString(),
+                    LocalDate.now().plusDays(1).toString()
+                )
+                Log.d("SimulatorFragment", "Fetched ${handballMatches.size} handball matches")
             } catch (e: Exception) {
                 Log.e("SimulatorFragment", "Error fetching matches", e)
             }
@@ -59,13 +73,51 @@ class SimulatorFragment : Fragment() {
         return binding.root
     }
 
-    private fun startSimulation() {
-        if(matches.isEmpty()) return
+    private fun startFootballSimulation() {
+        if (footballMatches.isEmpty()) {
+            Log.d("SimulatorFragment", "No football matches available for simulation")
+            return
+        }
 
-        simulationJob = lifecycleScope.launch {
-            for (minute in 1..90) {
-                delay(5_000) // Wait for 1 minute
-                updateMatchTimesAndScore(minute)
+        footballSimulationJob = startSimulation(
+            matches = footballMatches,
+            totalMinutes = 90,
+            delayPerMinute = 5_000 // 1 minute delay
+        )
+    }
+
+    private fun startHandballSimulation() {
+        if (handballMatches.isEmpty()) {
+            Log.d("SimulatorFragment", "No handball matches available for simulation")
+            return
+        }
+
+        handballSimulationJob = startSimulation(
+            matches = handballMatches,
+            totalMinutes = 60,
+            delayPerMinute = 5_000 // 30 seconds delay
+        )
+    }
+
+    private fun stopSimulation() {
+        footballSimulationJob?.cancel()
+        footballSimulationJob = null
+
+        handballSimulationJob?.cancel()
+        handballSimulationJob = null
+
+        Log.d("SimulatorFragment", "All simulations stopped")
+    }
+
+    private fun startSimulation(
+        matches: List<Match>,
+        totalMinutes: Int,
+        delayPerMinute: Long
+    ): Job {
+        return lifecycleScope.launch {
+            for (minute in 1..totalMinutes) {
+                delay(delayPerMinute)
+                updateMatchTimesAndScore(matches, minute)
 
                 if (!isActive) {
                     Log.d("SimulatorFragment", "Simulation stopped")
@@ -75,21 +127,17 @@ class SimulatorFragment : Fragment() {
         }
     }
 
-    private fun stopSimulation() {
-        simulationJob?.cancel()
-        simulationJob = null
-        Log.d("SimulatorFragment", "Simulation stopped")
-    }
-
-    private fun updateMatchTimesAndScore(currentMinute: Int) {
-        // Update the time for all matches and occasionally update the score for one
+    private fun updateMatchTimesAndScore(matches: List<Match>, currentMinute: Int) {
+        // Update the time for all matches
         matches.forEach { match ->
             match.time = "$currentMinute'" // Update time for all matches
         }
 
-        if ((1..4).random() == 1) { // ~25% chance to update a score
+        // Adjust scoring chance based on the sport
+        val scoringChance = if (matches == footballMatches) 4 else 2 // ~25% for football, ~50% for handball
+        if ((1..scoringChance).random() == 1) {
             val randomIdx = (matches.indices).randomOrNull() ?: return
-            val (homeScore, awayScore) = matches[randomIdx].score.split(" - ").map { it.toInt() }
+            val (homeScore, awayScore) = matches[randomIdx].score.replace(" ", "").split("-").map { it.toInt() }
             val newScore = if ((0..1).random() == 0) {
                 "${homeScore + 1} - $awayScore"
             } else {
@@ -99,9 +147,19 @@ class SimulatorFragment : Fragment() {
             Log.d("SimulatorFragment", "Updating score for match: ${matches[randomIdx]}")
         }
 
+        // Determine the appropriate API endpoint based on the sport
+        val updateMatchApi: (String, String, Match) -> Call<Match> = when (matches) {
+            footballMatches -> RetrofitInstance.api::updateFootballMatch
+            handballMatches -> RetrofitInstance.api::updateHandballMatch
+            else -> {
+                Log.e("SimulatorFragment", "Unknown match type, cannot update.")
+                return
+            }
+        }
+
         // Send updates for all matches to the server
         matches.forEach { match ->
-            RetrofitInstance.api.updateFootballMatch("Bearer: ${myApp.user?.token!!}", match._id, match).enqueue(object : Callback<Match> {
+            updateMatchApi("Bearer: ${myApp.user?.token!!}", match._id, match).enqueue(object : Callback<Match> {
                 override fun onResponse(call: Call<Match>, response: Response<Match>) {
                     if (response.isSuccessful) {
                         val updatedMatch = response.body()
@@ -110,7 +168,6 @@ class SimulatorFragment : Fragment() {
                             val index = currentList.indexOfFirst { curr -> updated._id == curr._id }
                             if (index != -1) {
                                 currentList[index] = updated
-                                matches = currentList
                                 Log.i("SimulatorFragment", "updateMatchTimesAndScore(), Success: $updated")
                             }
                         }
@@ -123,14 +180,11 @@ class SimulatorFragment : Fragment() {
                     Log.e("SimulatorFragment", "updateMatchTimesAndScore() failed: ${t.message}")
                 }
             })
-            myApp.sendUpdateMatchOnSocket()
         }
 
         // Notify the socket about updates
+        myApp.sendUpdateMatchOnSocket()
         Log.d("SimulatorFragment", "Updating matches with time: $currentMinute' and scores")
     }
-
-
-
 
 }

@@ -17,6 +17,7 @@ import java.time.ZoneId
 
 object RetrofitInstance {
     private const val BASE_URL = "http://77.38.76.152:3000" // Replace with your server URL
+//    private const val BASE_URL = "http://164.8.210.144:3000"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // Options: NONE, BASIC, HEADERS, BODY

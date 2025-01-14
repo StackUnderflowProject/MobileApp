@@ -104,5 +104,8 @@
     <string name="simulator">Simulator</string>
     <string name="start_simulation">Start simulation</string>
     <string name="stop_simulation">Stop Simulation</string>
+    <string name="start_football_simulation">Start Football Simulation</string>
+    <string name="start_handball_simulation">Start Handball Simulation</string>
+    <string name="stop_simulations">Stop Simulations</string>
 
 </resources>
