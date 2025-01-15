@@ -1,6 +1,7 @@
 package com.example.spotter.ui.simulator
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -49,6 +50,8 @@ class SimulatorFragment : Fragment() {
         binding.btnStopSimulation.setOnClickListener {
             stopSimulation()
         }
+
+        binding.tvLogs.movementMethod = ScrollingMovementMethod()
 
         lifecycleScope.launch {
             try {
@@ -106,85 +109,107 @@ class SimulatorFragment : Fragment() {
         handballSimulationJob?.cancel()
         handballSimulationJob = null
 
+        appendLog("All simulations stopped")
         Log.d("SimulatorFragment", "All simulations stopped")
     }
+
+    private fun appendLog(message: String) {
+        binding.tvLogs.append("$message\n")
+        // Scroll to the bottom of the TextView
+        binding.tvLogs.post {
+            val scrollAmount = binding.tvLogs.layout.getLineTop(binding.tvLogs.lineCount) - binding.tvLogs.height
+            if (scrollAmount > 0) {
+                binding.tvLogs.scrollTo(0, scrollAmount)
+            } else {
+                binding.tvLogs.scrollTo(0, 0)
+            }
+        }
+    }
+
 
     private fun startSimulation(
         matches: List<Match>,
         totalMinutes: Int,
         delayPerMinute: Long
     ): Job {
+        appendLog("Starting simulation with ${matches.size} matches")
+
         return lifecycleScope.launch {
+            val matchDurations = matches.associateWith { match ->
+                // Extract the current minute from the match's time (e.g., "45'")
+                val currentTime = match.time.removeSuffix("'").toIntOrNull() ?: 0
+                currentTime to totalMinutes - currentTime // Calculate remaining minutes
+            }
+
+            matchDurations.forEach { (match, times) ->
+                appendLog("\nMatch ${match._id} starts simulation at ${times.first}' with ${times.second} minutes remaining")
+            }
+
+            // Simulate matches concurrently
             for (minute in 1..totalMinutes) {
                 delay(delayPerMinute)
-                updateMatchTimesAndScore(matches, minute)
+
+                matchDurations.forEach { (match, times) ->
+                    val (startMinute, remainingMinutes) = times
+                    val currentMinute = startMinute + minute
+                    if (minute <= remainingMinutes && currentMinute <= totalMinutes) {
+                        appendLog("\nMinute $currentMinute for Match ${match._id}:")
+                        updateMatchTimeAndScoreForSingleMatch(match, currentMinute)
+                    }
+                }
 
                 if (!isActive) {
-                    Log.d("SimulatorFragment", "Simulation stopped")
+                    appendLog("Simulation stopped at minute $minute")
                     break
                 }
             }
         }
     }
 
-    private fun updateMatchTimesAndScore(matches: List<Match>, currentMinute: Int) {
-        // Update the time for all matches
-        matches.forEach { match ->
-            match.time = "$currentMinute'" // Update time for all matches
-        }
+    private fun updateMatchTimeAndScoreForSingleMatch(match: Match, currentMinute: Int) {
+        // Update time for the match
+        match.time = "$currentMinute'"
 
         // Adjust scoring chance based on the sport
-        val scoringChance = if (matches == footballMatches) 4 else 2 // ~25% for football, ~50% for handball
+        val scoringChance = if (match in footballMatches) 4 else 2 // ~25% for football, ~50% for handball
         if ((1..scoringChance).random() == 1) {
-            val randomIdx = (matches.indices).randomOrNull() ?: return
-            val (homeScore, awayScore) = matches[randomIdx].score.replace(" ", "").split("-").map { it.toInt() }
+            val (homeScore, awayScore) = match.score.replace(" ", "").split("-").map { it.toInt() }
             val newScore = if ((0..1).random() == 0) {
                 "${homeScore + 1} - $awayScore"
             } else {
                 "$homeScore - ${awayScore + 1}"
             }
-            matches[randomIdx].score = newScore
-            Log.d("SimulatorFragment", "Updating score for match: ${matches[randomIdx]}")
+            match.score = newScore
+            appendLog("\t- Score updated ${match.score}")
         }
 
-        // Determine the appropriate API endpoint based on the sport
-        val updateMatchApi: (String, String, Match) -> Call<Match> = when (matches) {
-            footballMatches -> RetrofitInstance.api::updateFootballMatch
-            handballMatches -> RetrofitInstance.api::updateHandballMatch
-            else -> {
-                Log.e("SimulatorFragment", "Unknown match type, cannot update.")
-                return
-            }
+        // Update match via API
+        val updateMatchApi = if (match in footballMatches) {
+            RetrofitInstance.api::updateFootballMatch
+        } else {
+            RetrofitInstance.api::updateHandballMatch
         }
 
-        // Send updates for all matches to the server
-        matches.forEach { match ->
-            updateMatchApi("Bearer: ${myApp.user?.token!!}", match._id, match).enqueue(object : Callback<Match> {
-                override fun onResponse(call: Call<Match>, response: Response<Match>) {
-                    if (response.isSuccessful) {
-                        val updatedMatch = response.body()
-                        updatedMatch?.let { updated ->
-                            val currentList = matches.toMutableList()
-                            val index = currentList.indexOfFirst { curr -> updated._id == curr._id }
-                            if (index != -1) {
-                                currentList[index] = updated
-                                Log.i("SimulatorFragment", "updateMatchTimesAndScore(), Success: $updated")
-                            }
-                        }
-                    } else {
-                        Log.i("SimulatorFragment", "updateMatchTimesAndScore(), Error: ${response.code()}")
+        updateMatchApi("Bearer: ${myApp.user?.token!!}", match._id, match).enqueue(object : Callback<Match> {
+            override fun onResponse(call: Call<Match>, response: Response<Match>) {
+                if (response.isSuccessful) {
+                    val updatedMatch = response.body()
+                    updatedMatch?.let { updated ->
+                        Log.i("SimulatorFragment", "Match updated successfully: $updated")
                     }
+                } else {
+                    Log.i("SimulatorFragment", "Failed to update match: ${response.code()}")
                 }
+            }
 
-                override fun onFailure(call: Call<Match>, t: Throwable) {
-                    Log.e("SimulatorFragment", "updateMatchTimesAndScore() failed: ${t.message}")
-                }
-            })
-        }
+            override fun onFailure(call: Call<Match>, t: Throwable) {
+                Log.e("SimulatorFragment", "Failed to update match: ${t.message}")
+            }
+        })
 
-        // Notify the socket about updates
+        // Notify the socket about the update
         myApp.sendUpdateMatchOnSocket()
-        Log.d("SimulatorFragment", "Updating matches with time: $currentMinute' and scores")
+        appendLog("\t- Socket event sent")
     }
 
 }

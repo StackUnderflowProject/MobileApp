@@ -37,7 +37,7 @@ class SpotterApp : Application(), WebsocketListener  {
         viewModelStore.clear()
     }
 
-    var webSocketManager: WebSocketManager? = null
+    private var webSocketManager: WebSocketManager? = null
 
     fun initializeWebSocket() {
         if (user == null || webSocketManager != null) return

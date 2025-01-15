@@ -11,10 +11,9 @@
         android:id="@+id/btn_start_football_simulation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:text="@string/start_football_simulation"
-        app:layout_constraintBottom_toTopOf="@+id/btn_start_handball_simulation"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,24 +21,38 @@
         android:id="@+id/btn_start_handball_simulation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="@string/start_handball_simulation"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_start_football_simulation" />
 
     <Button
         android:id="@+id/btn_stop_simulation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="@string/stop_simulations"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_start_handball_simulation" />
 
+    <TextView
+        android:id="@+id/tv_logs"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        android:background="@android:color/black"
+        android:textColor="@android:color/white"
+        android:padding="8dp"
+        android:textSize="14sp"
+        android:scrollbars="vertical"
+        android:gravity="start|top"
+        app:layout_constraintTop_toBottomOf="@+id/btn_stop_simulation"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
