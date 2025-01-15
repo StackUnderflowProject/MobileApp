@@ -118,6 +118,7 @@ class LoginFragment : Fragment() {
                         callback(1)
                     }
                 }
+
                 override fun onFailure(call: Call<User>, t: Throwable) {
                     Log.i("Output", "Failed ${t.message}")
                     callback(2)

@@ -37,7 +37,7 @@ class SpotterApp : Application(), WebsocketListener  {
         viewModelStore.clear()
     }
 
-    var webSocketManager: WebSocketManager? = null
+    private var webSocketManager: WebSocketManager? = null
 
     fun initializeWebSocket() {
         if (user == null || webSocketManager != null) return
@@ -54,6 +54,11 @@ class SpotterApp : Application(), WebsocketListener  {
     fun sendDeleteEventOnSocket() {
         if (user == null || webSocketManager == null) return
         webSocketManager!!.emitDeleteEvent()
+    }
+
+    fun sendUpdateMatchOnSocket() {
+        if (user == null || webSocketManager == null) return
+        webSocketManager!!.emitUpdateMatch()
     }
 
     override fun onChange() {

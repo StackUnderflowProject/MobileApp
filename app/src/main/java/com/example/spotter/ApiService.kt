@@ -55,4 +55,22 @@ interface ApiService {
 
     @PATCH("/events/{id}/predicted-count")
     fun uploadPredictedCount(@Header("Authorization") token: String, @Path("id") eventId: ObjectId, @Body input: PREDICT_IMG_OUTPUT) : Call<Event>
+
+    @GET("footballMatch/filterByDateRange/{startDate}/{endDate}")
+    suspend fun getFootballMatches(
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String
+    ): List<Match>
+
+    @PUT("footballMatch/{id}")
+    fun updateFootballMatch(@Header("Authorization") token: String, @Path("id") id: String, @Body req: Match) : Call<Match>
+
+    @PUT("handballMatch/{id}")
+    fun updateHandballMatch(@Header("Authorization") token: String, @Path("id") id: String, @Body req: Match) : Call<Match>
+
+    @GET("handballMatch/filterByDateRange/{startDate}/{endDate}")
+    suspend fun getHandballMatches(
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String
+    ): List<Match>
 }

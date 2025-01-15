@@ -1,6 +1,7 @@
 package com.example.spotter
 
 import android.util.Log
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -11,13 +12,13 @@ import org.bson.types.ObjectId
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.lang.reflect.Type
 import java.time.Instant
 import java.time.ZoneId
 
 object RetrofitInstance {
     private const val BASE_URL = "http://77.38.76.152:3000" // Replace with your server URL
+//    private const val BASE_URL = "http://164.8.210.144:3000"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // Options: NONE, BASIC, HEADERS, BODY
@@ -49,7 +50,7 @@ object RetrofitInstance {
         }
     }
 
-    val gson = GsonBuilder()
+    private val gson: Gson = GsonBuilder()
         .registerTypeAdapter(LocalDate::class.java, LocalDateDeserializer())
         .registerTypeAdapter(ObjectId::class.java, ObjectIdDeserializer())
         .create()
