@@ -18,7 +18,7 @@ Za namestitev potrebujemo:
    ```
    ![image](https://github.com/user-attachments/assets/ea4e74af-cd1e-418e-ad9c-7ad27486ffa6)
    
-   Pri čerem vnesemo v polje 'Directory', dejansko mapo v katero, želimo namestiti projekt
+   Pri čemer vnesemo v polje 'Directory', dejansko mapo v katero, želimo namestiti projekt
 
 **2. Počakamo da se izgraditev projekta konča (opazujemo dogajanje v desnem spodnem kotu)**
 
