@@ -24,8 +24,8 @@ import java.time.LocalDate
 class SimulatorFragment : Fragment() {
     private lateinit var binding: FragmentSimulatorBinding
     private lateinit var myApp: SpotterApp
-    private lateinit var footballMatches: List<Match>
-    private lateinit var handballMatches: List<Match>
+    private  var footballMatches: List<Match> = emptyList()
+    private  var handballMatches: List<Match> = emptyList()
     private var footballSimulationJob: Job? = null
     private var handballSimulationJob: Job? = null
 
@@ -173,11 +173,11 @@ class SimulatorFragment : Fragment() {
         // Adjust scoring chance based on the sport
         val scoringChance = if (match in footballMatches) 4 else 2 // ~25% for football, ~50% for handball
         if ((1..scoringChance).random() == 1) {
-            val (homeScore, awayScore) = match.score.replace(" ", "").split("-").map { it.toInt() }
+            val (homeScore, awayScore) = match.score.replace(" ", "").split("-", ":", limit = 2).map { it.toInt() }
             val newScore = if ((0..1).random() == 0) {
-                "${homeScore + 1} - $awayScore"
+                "${homeScore + 1} : $awayScore"
             } else {
-                "$homeScore - ${awayScore + 1}"
+                "$homeScore : ${awayScore + 1}"
             }
             match.score = newScore
             appendLog("\t- Score updated ${match.score}")

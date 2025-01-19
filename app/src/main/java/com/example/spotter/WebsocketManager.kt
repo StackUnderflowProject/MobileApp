@@ -12,7 +12,7 @@ class WebSocketManager {
             val options = IO.Options()
             options.query = "auth_token=$token" // Optional query parameters
             socket = IO.socket("http://77.38.76.152:3001", options)
-//            socket = IO.socket("http://164.8.210.144:3001", options)
+//            socket = IO.socket("http://192.168.0.31:3001", options)
             // Listen for events
             socket.on(Socket.EVENT_CONNECT) {
                 Log.i("Socket", "connected successfully to websocket")
