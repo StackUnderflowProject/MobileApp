@@ -97,4 +97,11 @@
     <string name="select_theme">Thema auswählen</string>
     <string name="select_language">Sprache auswählen</string>
     <string name="logout">ABMELDEN</string>
+
+    <string name="english">Englisch</string>
+    <string name="slovenian">Slowenisch</string>
+    <string name="german">Deutsch</string>
+    <string name="dark_theme">Dunkles Design</string>
+    <string name="light_theme">Helles Design</string>
+    <string name="cancel">Abbrechen</string>
 </resources>
