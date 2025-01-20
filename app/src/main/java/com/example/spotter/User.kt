@@ -8,7 +8,7 @@ class User(
     val username : String,
     val email : String,
     val __v : Int = 0,
-    val image : String = "",
+    var image : String = "",
     var token : String = "",
     var loginTime : Long = 0
 ) {

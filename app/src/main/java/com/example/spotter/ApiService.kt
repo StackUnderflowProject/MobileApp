@@ -73,4 +73,8 @@ interface ApiService {
         @Path("startDate") startDate: String,
         @Path("endDate") endDate: String
     ): List<Match>
+
+    @Multipart
+    @PUT("/users/profilePicture")
+    fun uploadProfilePicture(@Header("Authorization") token: String, @Part image: MultipartBody.Part) : Call<User>
 }

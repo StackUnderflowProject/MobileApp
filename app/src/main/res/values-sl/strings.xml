@@ -96,4 +96,11 @@
     <string name="select_theme">Izberi temo</string>
     <string name="select_language">Izberi jezik</string>
     <string name="logout">ODJAVA</string>
+
+    <string name="english">Angleščina</string>
+    <string name="slovenian">Slovenščina</string>
+    <string name="german">Nemščina</string>
+    <string name="dark_theme">Temna tema</string>
+    <string name="light_theme">Svetla tema</string>
+    <string name="cancel">Prekliči</string>
 </resources>

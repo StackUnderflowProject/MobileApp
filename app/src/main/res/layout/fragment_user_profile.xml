@@ -7,25 +7,16 @@
     android:layout_height="match_parent"
     android:background="@color/grey_4">
 
-    <ImageView
-        android:id="@+id/imageProfilePicture"
-        android:layout_width="143dp"
-        android:layout_height="144dp"
-        android:layout_marginTop="64dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/download__5__removebg_preview" />
-
     <ImageButton
         android:id="@+id/btnChangeProfilePicture"
         android:layout_width="47dp"
         android:layout_height="44dp"
-        android:layout_marginStart="92dp"
-        android:layout_marginTop="116dp"
+        android:layout_marginStart="90dp"
+        android:layout_marginTop="110dp"
         android:background="@drawable/upload_profile_pic_btn"
-        app:layout_constraintStart_toStartOf="@+id/imageProfilePicture"
-        app:layout_constraintTop_toTopOf="@+id/imageProfilePicture"
+        android:elevation="100dp"
+        app:layout_constraintStart_toStartOf="@+id/constraintLayout3"
+        app:layout_constraintTop_toTopOf="@+id/constraintLayout3"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
     <Button
@@ -88,11 +79,12 @@
         android:id="@+id/labelUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="28dp"
         android:text="Username"
         android:textColor="#D83CFB"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
+        app:layout_constraintHorizontal_bias="0.429"
         app:layout_constraintStart_toStartOf="@+id/guideline8"
         app:layout_constraintTop_toBottomOf="@+id/btnChangeProfilePicture" />
 
@@ -106,5 +98,50 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline8"
         app:layout_constraintTop_toBottomOf="@+id/labelUsername" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout3"
+        android:layout_width="144dp"
+        android:layout_height="144dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageProfilePicture"
+            android:layout_width="140dp"
+            android:layout_height="150dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/download__5__removebg_preview" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/dimmer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#94000000"
+            android:elevation="10dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ProgressBar
+                android:id="@+id/circularProgressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
