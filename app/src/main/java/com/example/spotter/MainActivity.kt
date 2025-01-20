@@ -5,6 +5,8 @@ import android.util.TimeUtils
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.findNavController
@@ -47,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications, R.id.navigation_simulator
+                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -61,6 +63,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        val preferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val isDarkMode: Boolean = preferences.getBoolean("dark_mode", true)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkMode) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+        val language = preferences.getString("language", "en") ?: "en"
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(language))
 
         val eventId = intent?.getStringExtra("eventNotifcation")
         if (eventId != null && savedInstanceState == null) {
@@ -82,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             bundle?.let {fragment.arguments = bundle}
             fragmentTransaction.replace(binding.fragmentContainer.id, fragment)
             if (backStack != null && backStack.isEmpty()) fragmentTransaction.addToBackStack(null)
-            if (!backStack.isNullOrEmpty()) fragmentTransaction.addToBackStack(backStack)
+            if (backStack != null && backStack.isNotEmpty()) fragmentTransaction.addToBackStack(backStack)
         }
 
         fragmentTransaction.commit()
